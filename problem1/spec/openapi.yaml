@@ -1,0 +1,50 @@
+openapi: "3.0.3"
+info:
+  title: "minimal sns app"
+  description: "road to mixi API document"
+  version: "1.0.0"
+paths:
+  /get_friend_list:
+    get:
+      description: "指定したユーザのフレンドのリストを返す"
+      summary: "get friend list of specified user"
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          description: "フレンドリストを取得したいユーザの id を指定する"
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FriendList"
+        "400":
+          description: "User not exist"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FriendList"
+components:
+  schemas:
+    id:
+      type: integer
+      maxLength: 11
+      example: 12345678910
+    name:
+      type: string
+      maxLength: 64
+      example: "鈴木 一郎"
+    FriendList:
+      type: object
+      properties:
+        userId:
+          $ref: "#/components/schemas/id"
+        name:
+          $ref: "#/components/schemas/name"
+      required:
+        - userId
+        - name
