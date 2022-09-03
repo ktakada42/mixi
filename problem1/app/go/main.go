@@ -9,6 +9,10 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"problem1/configs"
+	"problem1/controller"
+	"problem1/repository"
+	"problem1/service"
+	"problem1/usecase"
 )
 
 func main() {
@@ -20,6 +24,11 @@ func main() {
 	}
 	defer db.Close()
 
+	friendListRepository := repository.NewFriendListRepository(db)
+	friendListService := service.NewFriendListService(friendListRepository)
+	friendListUseCase := usecase.NewFriendListUseCase(db, friendListService)
+	friendListController := controller.NewFriendListController(friendListUseCase)
+
 	e := echo.New()
 
 	e.GET("/", func(c echo.Context) error {
@@ -27,8 +36,7 @@ func main() {
 	})
 
 	e.GET("/get_friend_list", func(c echo.Context) error {
-		// FIXME
-		return nil
+		return friendListController.GetFriendListByUserId(c)
 	})
 
 	e.GET("/get_friend_of_friend_list", func(c echo.Context) error {
