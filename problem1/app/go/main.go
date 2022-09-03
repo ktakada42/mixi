@@ -2,11 +2,13 @@ package main
 
 import (
 	"database/sql"
+	"net/http"
+	"strconv"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo/v4"
-	"net/http"
+
 	"problem1/configs"
-	"strconv"
 )
 
 func main() {
