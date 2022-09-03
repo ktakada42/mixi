@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	_ "github.com/go-sql-driver/mysql" // mysql
 
 	"github.com/DATA-DOG/go-txdb"
@@ -50,4 +51,22 @@ func ExecSQL(t *testing.T, db *sql.DB, q string, args ...any) {
 	if _, err := db.Exec(q, args...); err != nil {
 		t.Fatal(err)
 	}
+}
+
+func NewSQLMock(t *testing.T) (*sql.DB, sqlmock.Sqlmock) {
+	t.Helper()
+
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		_ = db.Close()
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	return db, mock
 }
