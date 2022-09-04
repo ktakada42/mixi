@@ -148,3 +148,49 @@ func Test_friendListService_GetFriendListByUserId(t *testing.T) {
 		})
 	}
 }
+
+func Test_friendListService_GetFriendListOfFriendsByUserId(t *testing.T) {
+	want := newFriendList()
+
+	tests := []struct {
+		name    string
+		expects func(test *friendListServiceTest)
+		want    *model.FriendList
+		wantErr bool
+	}{
+		{
+			name: "ok",
+			expects: func(st *friendListServiceTest) {
+				st.flr.EXPECT().GetFriendListOfFriendsByUserId(gomock.Any()).Return(want, nil)
+			},
+			want:    want,
+			wantErr: false,
+		},
+		{
+			name: "ng: error at GetFriendListOfFriendsByUserId()",
+			expects: func(st *friendListServiceTest) {
+				st.flr.EXPECT().GetFriendListOfFriendsByUserId(gomock.Any()).Return(nil, testutil.ErrTest)
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			st := newFriendListServiceTest(t)
+			tt.expects(st)
+
+			c, err := httputil.SetUpContext("")
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			got, err := st.fls.GetFriendListOfFriendsByUserId(c)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("GetFriendListOfFriendsByUserId() error = %v, wantErr = %v", err, tt.wantErr)
+			}
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
