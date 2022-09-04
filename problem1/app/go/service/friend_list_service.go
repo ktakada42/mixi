@@ -12,6 +12,7 @@ import (
 type FriendListService interface {
 	CheckUserExist(c echo.Context) (bool, error)
 	GetFriendListByUserId(c echo.Context) (*model.FriendList, error)
+	GetFriendListOfFriendsByUserId(c echo.Context) (*model.FriendList, error)
 }
 
 type friendListService struct {
@@ -30,4 +31,8 @@ func (s *friendListService) CheckUserExist(c echo.Context) (bool, error) {
 
 func (s *friendListService) GetFriendListByUserId(c echo.Context) (*model.FriendList, error) {
 	return s.flr.GetFriendListByUserId(c)
+}
+
+func (s *friendListService) GetFriendListOfFriendsByUserId(c echo.Context) (*model.FriendList, error) {
+	return s.flr.GetFriendListOfFriendsByUserId(c)
 }
