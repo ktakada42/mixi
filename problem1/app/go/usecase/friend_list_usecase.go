@@ -14,7 +14,7 @@ import (
 //go:generate go run github.com/golang/mock/mockgen -source=$GOFILE -destination=../mock/mock_$GOPACKAGE/mock_$GOFILE
 
 type FriendListUseCase interface {
-	GetFriendListByUserId(c echo.Context) ([]*model.User, error)
+	GetFriendListByUserId(c echo.Context) (*model.FriendList, error)
 }
 
 type friendListUseCase struct {
@@ -41,7 +41,7 @@ func (u *friendListUseCase) checkUserExist(e echo.Context) error {
 	return httputil.NewHTTPError(err, http.StatusBadRequest, "user not exist")
 }
 
-func (u *friendListUseCase) GetFriendListByUserId(c echo.Context) ([]*model.User, error) {
+func (u *friendListUseCase) GetFriendListByUserId(c echo.Context) (*model.FriendList, error) {
 	if err := u.checkUserExist(c); err != nil {
 		return nil, err
 	}

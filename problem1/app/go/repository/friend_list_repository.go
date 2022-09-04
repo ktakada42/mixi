@@ -13,7 +13,7 @@ import (
 
 type FriendListRepository interface {
 	CheckUserExist(c echo.Context) (bool, error)
-	GetFriendListByUserId(c echo.Context) ([]*model.User, error)
+	GetFriendListByUserId(c echo.Context) (*model.FriendList, error)
 }
 
 type friendListRepository struct {
@@ -48,7 +48,7 @@ WHERE user_id = ?`
 	return true, nil
 }
 
-func (r *friendListRepository) GetFriendListByUserId(c echo.Context) ([]*model.User, error) {
+func (r *friendListRepository) GetFriendListByUserId(c echo.Context) (*model.FriendList, error) {
 	userId := c.QueryParam("userId")
 
 	const q = `
@@ -63,18 +63,18 @@ WHERE FL.user1_id = ?`
 	}
 	defer rows.Close()
 
-	var friendList []*model.User
+	var friends []*model.User
 	for rows.Next() {
 		friend := &model.User{}
 		if err := rows.Scan(&friend.Id, &friend.Name); err != nil {
 			return nil, err
 		}
 
-		friendList = append(friendList, friend)
+		friends = append(friends, friend)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 
-	return friendList, nil
+	return &model.FriendList{Friends: friends}, nil
 }
