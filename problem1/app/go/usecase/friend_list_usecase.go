@@ -15,6 +15,7 @@ import (
 
 type FriendListUseCase interface {
 	GetFriendListByUserId(c echo.Context) (*model.FriendList, error)
+	GetFriendListOfFriendsByUserId(c echo.Context) (*model.FriendList, error)
 }
 
 type friendListUseCase struct {
@@ -47,4 +48,12 @@ func (u *friendListUseCase) GetFriendListByUserId(c echo.Context) (*model.Friend
 	}
 
 	return u.fls.GetFriendListByUserId(c)
+}
+
+func (u *friendListUseCase) GetFriendListOfFriendsByUserId(c echo.Context) (*model.FriendList, error) {
+	if err := u.checkUserExist(c); err != nil {
+		return nil, err
+	}
+
+	return u.fls.GetFriendListOfFriendsByUserId(c)
 }
