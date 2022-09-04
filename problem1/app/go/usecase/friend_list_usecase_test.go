@@ -164,3 +164,59 @@ func Test_friendListUseCase_GetFriendListByUesrId(t *testing.T) {
 		})
 	}
 }
+
+func Test_friendListUseCase_GetFriendListOfFriendsByUesrId(t *testing.T) {
+	want := newFriendList()
+
+	tests := []struct {
+		name    string
+		expects func(*friendListUseCaseTest)
+		want    *model.FriendList
+		wantErr bool
+	}{
+		{
+			name: "ok",
+			expects: func(ut *friendListUseCaseTest) {
+				ut.fls.EXPECT().CheckUserExist(gomock.Any()).Return(true, nil)
+				ut.fls.EXPECT().GetFriendListOfFriendsByUserId(gomock.Any()).Return(want, nil)
+			},
+			want:    want,
+			wantErr: false,
+		},
+		{
+			name: "ng: user not exist",
+			expects: func(ut *friendListUseCaseTest) {
+				ut.fls.EXPECT().CheckUserExist(gomock.Any()).Return(false, testutil.ErrTest)
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "ng: error at GetFriendListOfFriendsByUserId()",
+			expects: func(ut *friendListUseCaseTest) {
+				ut.fls.EXPECT().CheckUserExist(gomock.Any()).Return(true, nil)
+				ut.fls.EXPECT().GetFriendListOfFriendsByUserId(gomock.Any()).Return(nil, testutil.ErrTest)
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ut := newFriendListUseCaseTest(t)
+			tt.expects(ut)
+
+			c, err := httputil.SetUpContext("")
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			got, err := ut.flu.GetFriendListOfFriendsByUserId(c)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("GetFriendListOfFriendsByUserId() error = %v, wantErr = %v", err, tt.wantErr)
+			}
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
