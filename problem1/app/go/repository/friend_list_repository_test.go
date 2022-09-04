@@ -30,15 +30,17 @@ func newFriendListRepositoryTest(t *testing.T) *friendListRepositoryTest {
 	}
 }
 
-func newFriendList() []*model.User {
-	return []*model.User{
-		{
-			Id:   111111,
-			Name: "hoge",
-		},
-		{
-			Id:   222222,
-			Name: "fuga",
+func newFriendList() *model.FriendList {
+	return &model.FriendList{
+		Friends: []*model.User{
+			{
+				Id:   111111,
+				Name: "hoge",
+			},
+			{
+				Id:   222222,
+				Name: "fuga",
+			},
 		},
 	}
 }
@@ -166,7 +168,7 @@ func Test_friendListRepository_GetFriendListByUserId(t *testing.T) {
 		name    string
 		prepare func(*friendListRepositoryTest)
 		param   string
-		want    []*model.User
+		want    *model.FriendList
 		wantErr bool
 	}{
 		{

@@ -38,15 +38,17 @@ func newFriendListServiceTest(t *testing.T) *friendListServiceTest {
 	}
 }
 
-func newFriendList() []*model.User {
-	return []*model.User{
-		{
-			Id:   111111,
-			Name: "hoge",
-		},
-		{
-			Id:   222222,
-			Name: "fuga",
+func newFriendList() *model.FriendList {
+	return &model.FriendList{
+		Friends: []*model.User{
+			{
+				Id:   111111,
+				Name: "hoge",
+			},
+			{
+				Id:   222222,
+				Name: "fuga",
+			},
 		},
 	}
 }
@@ -112,7 +114,7 @@ func Test_friendListService_GetFriendListByUserId(t *testing.T) {
 	tests := []struct {
 		name    string
 		expects func(test *friendListServiceTest)
-		want    []*model.User
+		want    *model.FriendList
 		wantErr bool
 	}{
 		{

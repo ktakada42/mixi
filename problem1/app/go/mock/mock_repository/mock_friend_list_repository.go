@@ -51,10 +51,10 @@ func (mr *MockFriendListRepositoryMockRecorder) CheckUserExist(c interface{}) *g
 }
 
 // GetFriendListByUserId mocks base method.
-func (m *MockFriendListRepository) GetFriendListByUserId(c echo.Context) ([]*model.User, error) {
+func (m *MockFriendListRepository) GetFriendListByUserId(c echo.Context) (*model.FriendList, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetFriendListByUserId", c)
-	ret0, _ := ret[0].([]*model.User)
+	ret0, _ := ret[0].(*model.FriendList)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
