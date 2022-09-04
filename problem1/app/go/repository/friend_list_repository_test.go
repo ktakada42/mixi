@@ -2,13 +2,11 @@ package repository
 
 import (
 	"database/sql"
-	"net/http"
-	"net/url"
 	"testing"
 
-	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
+	"problem1/httputil"
 	"problem1/model"
 	"problem1/testutil"
 )
@@ -120,13 +118,10 @@ func Test_friendListRepository_CheckUserExist(t *testing.T) {
 			rt := newFriendListRepositoryTest(t)
 			tt.prepare(rt)
 
-			e := echo.New()
-			e.GET("", nil)
-			url, err := url.Parse(tt.param)
+			c, err := httputil.SetUpContext(tt.param)
 			if err != nil {
 				t.Fatal(err)
 			}
-			c := e.NewContext(&http.Request{URL: url}, nil)
 
 			got, err := rt.flr.CheckUserExist(c)
 			if (err != nil) != tt.wantErr {
@@ -192,13 +187,10 @@ func Test_friendListRepository_GetFriendListByUserId(t *testing.T) {
 			rt := newFriendListRepositoryTest(t)
 			tt.prepare(rt)
 
-			e := echo.New()
-			e.GET("", nil)
-			url, err := url.Parse(tt.param)
+			c, err := httputil.SetUpContext(tt.param)
 			if err != nil {
 				t.Fatal(err)
 			}
-			c := e.NewContext(&http.Request{URL: url}, nil)
 
 			got, err := rt.flr.GetFriendListByUserId(c)
 			if (err != nil) != tt.wantErr {

@@ -2,15 +2,13 @@ package service
 
 import (
 	"database/sql"
-	"net/http"
-	"net/url"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/golang/mock/gomock"
-	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
+	"problem1/httputil"
 	"problem1/mock/mock_repository"
 	"problem1/model"
 	"problem1/testutil"
@@ -91,13 +89,10 @@ func Test_friendListService_CheckUserExist(t *testing.T) {
 			st := newFriendListServiceTest(t)
 			tt.expects(st)
 
-			e := echo.New()
-			e.GET("", nil)
-			url, err := url.Parse("")
+			c, err := httputil.SetUpContext("")
 			if err != nil {
 				t.Fatal(err)
 			}
-			c := e.NewContext(&http.Request{URL: url}, nil)
 
 			got, err := st.fls.CheckUserExist(c)
 			if (err != nil) != tt.wantErr {
@@ -140,13 +135,10 @@ func Test_friendListService_GetFriendListByUserId(t *testing.T) {
 			st := newFriendListServiceTest(t)
 			tt.expects(st)
 
-			e := echo.New()
-			e.GET("", nil)
-			url, err := url.Parse("")
+			c, err := httputil.SetUpContext("")
 			if err != nil {
 				t.Fatal(err)
 			}
-			c := e.NewContext(&http.Request{URL: url}, nil)
 
 			got, err := st.fls.GetFriendListByUserId(c)
 			if (err != nil) != tt.wantErr {

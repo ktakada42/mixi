@@ -3,12 +3,10 @@ package usecase
 import (
 	"database/sql"
 	"net/http"
-	"net/url"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/golang/mock/gomock"
-	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
 	"problem1/httputil"
@@ -93,13 +91,10 @@ func Test_friendListUseCase_checkUserExist(t *testing.T) {
 			ut := newFriendListUseCaseTest(t)
 			tt.expects(ut)
 
-			e := echo.New()
-			e.GET("", nil)
-			url, err := url.Parse("")
+			c, err := httputil.SetUpContext("")
 			if err != nil {
 				t.Fatal(err)
 			}
-			c := e.NewContext(&http.Request{URL: url}, nil)
 
 			err = ut.fluStruct.checkUserExist(c)
 			if (err != nil) != tt.wantErr {
@@ -156,13 +151,10 @@ func Test_friendListUseCase_GetFriendListByUesrId(t *testing.T) {
 			ut := newFriendListUseCaseTest(t)
 			tt.expects(ut)
 
-			e := echo.New()
-			e.GET("", nil)
-			url, err := url.Parse("")
+			c, err := httputil.SetUpContext("")
 			if err != nil {
 				t.Fatal(err)
 			}
-			c := e.NewContext(&http.Request{URL: url}, nil)
 
 			got, err := ut.flu.GetFriendListByUserId(c)
 			if (err != nil) != tt.wantErr {
