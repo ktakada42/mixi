@@ -200,3 +200,80 @@ func Test_friendListRepository_GetFriendListByUserId(t *testing.T) {
 		})
 	}
 }
+
+func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
+	want := newFriendList()
+	testUsers := []testUser{
+		{
+			userId: 123456789,
+			name:   testutil.UserNameForDebug,
+		},
+		{
+			userId: 111111,
+			name:   "hoge",
+		},
+		{
+			userId: 222222,
+			name:   "fuga",
+		},
+	}
+	testFriendLinks := []friendLink{
+		{
+			user1Id: 123456789,
+			user2Id: 111111,
+		},
+		{
+			user1Id: 123456789,
+			user2Id: 222222,
+		},
+		{
+			user1Id: 111111,
+			user2Id: 222222,
+		},
+		{
+			user1Id: 222222,
+			user2Id: 111111,
+		},
+	}
+
+	tests := []struct {
+		name    string
+		prepare func(*friendListRepositoryTest)
+		param   string
+		want    *model.FriendList
+		wantErr bool
+	}{
+		{
+			name: "ok",
+			prepare: func(rt *friendListRepositoryTest) {
+				for _, tu := range testUsers {
+					rt.insertTestUserList(t, rt.db, tu)
+				}
+				for _, fl := range testFriendLinks {
+					rt.insertTestFriendLink(t, rt.db, fl)
+				}
+			},
+			param:   "/?userId=123456789",
+			want:    want,
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rt := newFriendListRepositoryTest(t)
+			tt.prepare(rt)
+
+			c, err := httputil.SetUpContext(tt.param)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			got, err := rt.flr.GetFriendListOfFriendsByUserId(c)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("GetFriendListOfFriendsByUserId() error = %v, wantErr = %v", err, tt.wantErr)
+			}
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
