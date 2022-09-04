@@ -23,7 +23,7 @@ for i in range(2, RECORD_COUNT):
     id1 = i
     # 0~100の乱数を生成
     while cnt < regi:
-        id2 = random.randint(0, 30)
+        id2 = random.randint(0, 29)
         if not id2 in ns and id1 != id2:
             ns.append(id2)
             # ランダムなデータからInsert文を生成
