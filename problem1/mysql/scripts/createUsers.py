@@ -7,7 +7,7 @@ def randomName():
     return f.name()
 
 # 出力するファイル名
-OUTPUT_FILE = "UsersTestData.sql"
+OUTPUT_FILE = "../UsersTestData.sql"
 
 # 登録するデータ件数
 RECORD_COUNT = 30

@@ -46,6 +46,9 @@ services:
       - ./mysql/my.cnf:/etc/mysql/my.cnf
       - ./mysql/conf.d/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
       - ./mysql/0_init.sql:/docker-entrypoint-initdb.d/0_init.sql
+      - ./mysql/UsersTestData.sql:/docker-entrypoint-initdb.d/UsersTestData.sql
+      - ./mysql/FriendLinkTestData.sql:/docker-entrypoint-initdb.d/FriendLinkTestData.sql
+      - ./mysql/BlockListTestData.sql:/docker-entrypoint-initdb.d/BlockListTestData.sql
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
       MYSQL_DATABASE: app
