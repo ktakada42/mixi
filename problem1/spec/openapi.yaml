@@ -27,7 +27,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/HTTPError"
   /get_friend_of_friend_list:
     get:
       description: "指定したユーザのフレンドのフレンドのリストを返す"
@@ -45,15 +45,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/FriendList"
         "400":
           description: "User not exist"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/HTTPError"
 components:
   schemas:
+    HTTPError:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: ステータスコード
+          default: 500
+        message:
+          type: string
+          example: "error message"
     id:
       type: integer
       maxLength: 11
@@ -72,3 +82,10 @@ components:
       required:
         - userId
         - name
+    FriendList:
+      type: object
+      properties:
+        friends:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
