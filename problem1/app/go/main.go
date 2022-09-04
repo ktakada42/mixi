@@ -40,8 +40,7 @@ func main() {
 	})
 
 	e.GET("/get_friend_of_friend_list", func(c echo.Context) error {
-		// FIXME
-		return nil
+		return friendListController.GetFriendListOfFriendsByUserId(c)
 	})
 
 	e.GET("/get_friend_of_friend_list_paging", func(c echo.Context) error {
