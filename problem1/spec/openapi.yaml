@@ -28,6 +28,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
+  /get_friend_of_friend_list:
+    get:
+      description: "指定したユーザのフレンドのフレンドのリストを返す"
+      summary: "get friend list of friends of specified user"
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          description: "フレンドリストを取得したいユーザの id を指定する"
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: "User not exist"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
 components:
   schemas:
     id:
