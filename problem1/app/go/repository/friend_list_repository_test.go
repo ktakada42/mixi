@@ -83,6 +83,58 @@ VALUES (0, ?, ?)`
 	testutil.ExecSQL(t, db, q, testRecord...)
 }
 
+func Test_friendListRepository_CheckUserExist(t *testing.T) {
+	tests := []struct {
+		name    string
+		prepare func(*friendListRepositoryTest)
+		param   string
+		want    bool
+		wantErr bool
+	}{
+		{
+			name: "ok",
+			prepare: func(rt *friendListRepositoryTest) {
+				tu := testUser{
+					userId: testutil.UserIDForDebug,
+					name:   testutil.UserNameForDebug,
+				}
+				rt.insertTestUserList(t, rt.db, tu)
+			},
+			param:   "/?userId=123456789",
+			want:    true,
+			wantErr: false,
+		},
+		{
+			name:    "ok: user not exist",
+			prepare: func(rt *friendListRepositoryTest) {},
+			param:   "/?userId=123456789",
+			want:    false,
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rt := newFriendListRepositoryTest(t)
+			tt.prepare(rt)
+
+			e := echo.New()
+			e.GET("", nil)
+			url, err := url.Parse(tt.param)
+			if err != nil {
+				t.Fatal(err)
+			}
+			c := e.NewContext(&http.Request{URL: url}, nil)
+
+			got, err := rt.flr.CheckUserExist(c)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("CheckUserExist() error = %v, wantErr = %v", err, tt.wantErr)
+			}
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
 func Test_friendListRepository_GetFriendListByUserId(t *testing.T) {
 	want := newFriendList()
 	testUsers := []testUser{

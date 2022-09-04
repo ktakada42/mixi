@@ -11,16 +11,18 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
+	"problem1/httputil"
 	"problem1/mock/mock_service"
 	"problem1/model"
 	"problem1/testutil"
 )
 
 type friendListUseCaseTest struct {
-	db   *sql.DB
-	mock sqlmock.Sqlmock
-	fls  *mock_service.MockFriendListService
-	flu  FriendListUseCase
+	db        *sql.DB
+	mock      sqlmock.Sqlmock
+	fls       *mock_service.MockFriendListService
+	flu       FriendListUseCase
+	fluStruct *friendListUseCase
 }
 
 func newFriendListUseCaseTest(t *testing.T) *friendListUseCaseTest {
@@ -32,10 +34,11 @@ func newFriendListUseCaseTest(t *testing.T) *friendListUseCaseTest {
 	flu := NewFriendListUseCase(db, fls)
 
 	return &friendListUseCaseTest{
-		db:   db,
-		mock: mock,
-		fls:  fls,
-		flu:  flu,
+		db:        db,
+		mock:      mock,
+		fls:       fls,
+		flu:       flu,
+		fluStruct: flu.(*friendListUseCase),
 	}
 }
 
@@ -52,26 +55,93 @@ func newFriendList() []*model.User {
 	}
 }
 
+func Test_friendListUseCase_checkUserExist(t *testing.T) {
+	tests := []struct {
+		name        string
+		expects     func(*friendListUseCaseTest)
+		wantErr     bool
+		wantErrCode int
+	}{
+		{
+			name: "ok",
+			expects: func(ut *friendListUseCaseTest) {
+				ut.fls.EXPECT().CheckUserExist(gomock.Any()).Return(true, nil)
+			},
+			wantErr: false,
+		},
+		{
+			name: "ng: error at CheckUserExitst()",
+			expects: func(ut *friendListUseCaseTest) {
+				ut.fls.EXPECT().CheckUserExist(gomock.Any()).Return(false, testutil.ErrTest)
+			},
+			wantErr: true,
+		},
+		{
+			name: "ng: user not exist",
+			expects: func(ut *friendListUseCaseTest) {
+				ut.fls.EXPECT().CheckUserExist(gomock.Any()).Return(false, nil)
+			},
+			wantErr:     true,
+			wantErrCode: http.StatusBadRequest,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ut := newFriendListUseCaseTest(t)
+			tt.expects(ut)
+
+			e := echo.New()
+			e.GET("", nil)
+			url, err := url.Parse("")
+			if err != nil {
+				t.Fatal(err)
+			}
+			c := e.NewContext(&http.Request{URL: url}, nil)
+
+			err = ut.fluStruct.checkUserExist(c)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("checkUserExist() error = %v, wantErr = %v", err, tt.wantErr)
+			}
+			if err != nil && tt.wantErrCode != 0 {
+				if !httputil.As(err, tt.wantErrCode) {
+					t.Fatalf("checkUserExist() error = %v, wantErrCode= %v", err, tt.wantErrCode)
+				}
+			}
+		})
+	}
+}
+
 func Test_friendListUseCase_GetFriendListByUesrId(t *testing.T) {
 	want := newFriendList()
 
 	tests := []struct {
 		name    string
-		expects func(test *friendListUseCaseTest)
+		expects func(*friendListUseCaseTest)
 		want    []*model.User
 		wantErr bool
 	}{
 		{
 			name: "ok",
 			expects: func(ut *friendListUseCaseTest) {
+				ut.fls.EXPECT().CheckUserExist(gomock.Any()).Return(true, nil)
 				ut.fls.EXPECT().GetFriendListByUserId(gomock.Any()).Return(want, nil)
 			},
 			want:    want,
 			wantErr: false,
 		},
 		{
+			name: "ng: user not exist",
+			expects: func(ut *friendListUseCaseTest) {
+				ut.fls.EXPECT().CheckUserExist(gomock.Any()).Return(false, testutil.ErrTest)
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
 			name: "ng: error at GetFriendListByUserId()",
 			expects: func(ut *friendListUseCaseTest) {
+				ut.fls.EXPECT().CheckUserExist(gomock.Any()).Return(true, nil)
 				ut.fls.EXPECT().GetFriendListByUserId(gomock.Any()).Return(nil, testutil.ErrTest)
 			},
 			want:    nil,

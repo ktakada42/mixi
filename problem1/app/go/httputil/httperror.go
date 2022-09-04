@@ -40,3 +40,12 @@ func ConvertErrorToHTTPError(statusCode int, err error) error {
 
 	return err
 }
+
+func As(err error, c int) bool {
+	var hErr HTTPError
+	if errors.As(err, &hErr) && hErr.StatusCode() == c {
+		return true
+	}
+
+	return false
+}

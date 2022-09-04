@@ -51,6 +51,61 @@ func newFriendList() []*model.User {
 	}
 }
 
+func Test_friendListService_CheckUserExist(t *testing.T) {
+	tests := []struct {
+		name    string
+		expects func(*friendListServiceTest)
+		want    bool
+		wantErr bool
+	}{
+		{
+			name: "ok: true",
+			expects: func(st *friendListServiceTest) {
+				st.flr.EXPECT().CheckUserExist(gomock.Any()).Return(true, nil)
+			},
+			want:    true,
+			wantErr: false,
+		},
+		{
+			name: "ok: false",
+			expects: func(st *friendListServiceTest) {
+				st.flr.EXPECT().CheckUserExist(gomock.Any()).Return(false, nil)
+			},
+			want:    false,
+			wantErr: false,
+		},
+		{
+			name: "ng: error at CheckUserExist()",
+			expects: func(st *friendListServiceTest) {
+				st.flr.EXPECT().CheckUserExist(gomock.Any()).Return(false, testutil.ErrTest)
+			},
+			want:    false,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			st := newFriendListServiceTest(t)
+			tt.expects(st)
+
+			e := echo.New()
+			e.GET("", nil)
+			url, err := url.Parse("")
+			if err != nil {
+				t.Fatal(err)
+			}
+			c := e.NewContext(&http.Request{URL: url}, nil)
+
+			got, err := st.fls.CheckUserExist(c)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("CheckUserExist() error = %v, wantErr = %v", err, tt.wantErr)
+			}
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
 func Test_friendListService_GetFriendListByUserId(t *testing.T) {
 	want := newFriendList()
 
