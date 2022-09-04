@@ -42,12 +42,12 @@ func (c *friendListController) GetFriendListByUserId(ctx echo.Context) error {
 		return err
 	}
 
-	friendLists, err := c.friendListUseCase.GetFriendListByUserId(ctx)
+	friendList, err := c.friendListUseCase.GetFriendListByUserId(ctx)
 	if err != nil {
 		httputil.RespondError(ctx, httputil.NewHTTPError(err, http.StatusInternalServerError, err.Error()))
 		return err
 	}
 
-	httputil.RespondJSON(ctx, http.StatusOK, friendLists)
+	httputil.RespondJSON(ctx, http.StatusOK, friendList)
 	return nil
 }

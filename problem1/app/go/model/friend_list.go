@@ -1,7 +1,7 @@
 package model
 
-// FriendList OpenAPI: FriendList
-type FriendList struct {
+// User OpenAPI: User
+type User struct {
 	Id   int    `json:"userId" db:"user_id"`
 	Name string `json:"name" db:"name"`
 }

@@ -11,7 +11,7 @@ import (
 //go:generate go run github.com/golang/mock/mockgen -source=$GOFILE -destination=../mock/mock_$GOPACKAGE/mock_$GOFILE
 
 type FriendListRepository interface {
-	GetFriendListByUserId(c echo.Context) ([]*model.FriendList, error)
+	GetFriendListByUserId(c echo.Context) ([]*model.User, error)
 }
 
 type friendListRepository struct {
@@ -24,7 +24,7 @@ func NewFriendListRepository(db *sql.DB) FriendListRepository {
 	}
 }
 
-func (r *friendListRepository) GetFriendListByUserId(c echo.Context) ([]*model.FriendList, error) {
+func (r *friendListRepository) GetFriendListByUserId(c echo.Context) ([]*model.User, error) {
 	userId := c.QueryParam("userId")
 
 	const q = `
@@ -39,18 +39,18 @@ WHERE FL.user1_id = ?`
 	}
 	defer rows.Close()
 
-	var friendLists []*model.FriendList
+	var friendList []*model.User
 	for rows.Next() {
-		friendList := &model.FriendList{}
-		if err := rows.Scan(&friendList.Id, &friendList.Name); err != nil {
+		friend := &model.User{}
+		if err := rows.Scan(&friend.Id, &friend.Name); err != nil {
 			return nil, err
 		}
 
-		friendLists = append(friendLists, friendList)
+		friendList = append(friendList, friend)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 
-	return friendLists, nil
+	return friendList, nil
 }

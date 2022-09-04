@@ -10,7 +10,7 @@ import (
 //go:generate go run github.com/golang/mock/mockgen -source=$GOFILE -destination=../mock/mock_$GOPACKAGE/mock_$GOFILE
 
 type FriendListService interface {
-	GetFriendListByUserId(c echo.Context) ([]*model.FriendList, error)
+	GetFriendListByUserId(c echo.Context) ([]*model.User, error)
 }
 
 type friendListService struct {
@@ -23,6 +23,6 @@ func NewFriendListService(flr repository.FriendListRepository) FriendListService
 	}
 }
 
-func (s *friendListService) GetFriendListByUserId(c echo.Context) ([]*model.FriendList, error) {
+func (s *friendListService) GetFriendListByUserId(c echo.Context) ([]*model.User, error) {
 	return s.flr.GetFriendListByUserId(c)
 }

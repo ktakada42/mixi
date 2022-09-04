@@ -12,7 +12,7 @@ import (
 //go:generate go run github.com/golang/mock/mockgen -source=$GOFILE -destination=../mock/mock_$GOPACKAGE/mock_$GOFILE
 
 type FriendListUseCase interface {
-	GetFriendListByUserId(c echo.Context) ([]*model.FriendList, error)
+	GetFriendListByUserId(c echo.Context) ([]*model.User, error)
 }
 
 type friendListUseCase struct {
@@ -27,6 +27,6 @@ func NewFriendListUseCase(db *sql.DB, fls service.FriendListService) FriendListU
 	}
 }
 
-func (u *friendListUseCase) GetFriendListByUserId(c echo.Context) ([]*model.FriendList, error) {
+func (u *friendListUseCase) GetFriendListByUserId(c echo.Context) ([]*model.User, error) {
 	return u.fls.GetFriendListByUserId(c)
 }

@@ -21,13 +21,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/FriendList"
+                $ref: "#/components/schemas/User"
         "400":
           description: "User not exist"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/FriendList"
+                $ref: "#/components/schemas/User"
 components:
   schemas:
     id:
@@ -38,7 +38,7 @@ components:
       type: string
       maxLength: 64
       example: "鈴木 一郎"
-    FriendList:
+    User:
       type: object
       properties:
         userId:

@@ -39,8 +39,8 @@ func newFriendListUseCaseTest(t *testing.T) *friendListUseCaseTest {
 	}
 }
 
-func newFriendList() []*model.FriendList {
-	return []*model.FriendList{
+func newFriendList() []*model.User {
+	return []*model.User{
 		{
 			Id:   111111,
 			Name: "hoge",
@@ -58,7 +58,7 @@ func Test_friendListUseCase_GetFriendListByUesrId(t *testing.T) {
 	tests := []struct {
 		name    string
 		expects func(test *friendListUseCaseTest)
-		want    []*model.FriendList
+		want    []*model.User
 		wantErr bool
 	}{
 		{
