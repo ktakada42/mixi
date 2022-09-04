@@ -14,6 +14,7 @@ import (
 type FriendListRepository interface {
 	CheckUserExist(c echo.Context) (bool, error)
 	GetFriendListByUserId(c echo.Context) (*model.FriendList, error)
+	GetFriendListOfFriendsByUserId(c echo.Context) (*model.FriendList, error)
 }
 
 type friendListRepository struct {
@@ -56,6 +57,40 @@ SELECT U.user_id, U.name
 FROM users AS U INNER JOIN friend_link AS FL
 ON U.user_id = FL.user2_id
 WHERE FL.user1_id = ?`
+
+	rows, err := r.db.Query(q, userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var friends []*model.User
+	for rows.Next() {
+		friend := &model.User{}
+		if err := rows.Scan(&friend.Id, &friend.Name); err != nil {
+			return nil, err
+		}
+
+		friends = append(friends, friend)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return &model.FriendList{Friends: friends}, nil
+}
+
+func (r *friendListRepository) GetFriendListOfFriendsByUserId(c echo.Context) (*model.FriendList, error) {
+	userId := c.QueryParam("userId")
+
+	const q = `
+	SELECT DISTINCT U.user_id, U.name
+	FROM users AS U
+	INNER JOIN friend_link AS FL
+	ON U.user_id = FL.user2_id
+	INNER JOIN friend_link AS FL2
+	ON FL.user1_id = FL2.user2_id
+	WHERE FL2.user1_id = ?;`
 
 	rows, err := r.db.Query(q, userId)
 	if err != nil {
