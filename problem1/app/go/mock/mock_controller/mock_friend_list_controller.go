@@ -47,3 +47,17 @@ func (mr *MockFriendListControllerMockRecorder) GetFriendListByUserId(c interfac
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFriendListByUserId", reflect.TypeOf((*MockFriendListController)(nil).GetFriendListByUserId), c)
 }
+
+// GetFriendListOfFriendsByUserId mocks base method.
+func (m *MockFriendListController) GetFriendListOfFriendsByUserId(c echo.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFriendListOfFriendsByUserId", c)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// GetFriendListOfFriendsByUserId indicates an expected call of GetFriendListOfFriendsByUserId.
+func (mr *MockFriendListControllerMockRecorder) GetFriendListOfFriendsByUserId(c interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFriendListOfFriendsByUserId", reflect.TypeOf((*MockFriendListController)(nil).GetFriendListOfFriendsByUserId), c)
+}
