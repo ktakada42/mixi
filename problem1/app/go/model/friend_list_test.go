@@ -7,13 +7,34 @@ import (
 )
 
 func Test_FriendList_SchemaValidation(t *testing.T) {
-	target := &User{
-		Id:   testutil.UserIDForDebug,
-		Name: testutil.UserNameForDebug,
+	tests := []struct {
+		schemaName string
+		target     any
+	}{
+		{
+			schemaName: "User",
+			target: &User{
+				Id:   testutil.UserIDForDebug,
+				Name: testutil.UserNameForDebug,
+			},
+		},
+		{
+			schemaName: "FriendList",
+			target: &FriendList{
+				Friends: []*User{
+					{
+						Id:   testutil.UserIDForDebug,
+						Name: testutil.UserNameForDebug,
+					},
+				},
+			},
+		},
 	}
 
 	ot := testutil.NewOpenAPITester(t, "../../../spec/openapi.yaml")
-	t.Run(`"User"がOpenAPIの"User"のスキーマと一致している`, func(t *testing.T) {
-		ot.ValidateBySchema(t, "User", target)
-	})
+	for _, tt := range tests {
+		t.Run(tt.schemaName, func(t *testing.T) {
+			ot.ValidateBySchema(t, tt.schemaName, tt.target)
+		})
+	}
 }
