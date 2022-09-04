@@ -53,3 +53,11 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
       MYSQL_DATABASE: app
       TZ: "Asia/Tokyo"
+  swagger-ui:
+    image: swaggerapi/swagger-ui:latest
+    ports:
+      - "3000:8080"
+    volumes:
+      - ./spec/openapi.yaml:/openapi.yaml
+    environment:
+      SWAGGER_JSON: /openapi.yaml
