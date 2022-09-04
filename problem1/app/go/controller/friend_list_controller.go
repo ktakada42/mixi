@@ -44,7 +44,7 @@ func (c *friendListController) GetFriendListByUserId(ctx echo.Context) error {
 
 	friendList, err := c.friendListUseCase.GetFriendListByUserId(ctx)
 	if err != nil {
-		httputil.RespondError(ctx, httputil.NewHTTPError(err, http.StatusInternalServerError, err.Error()))
+		httputil.RespondError(ctx, err)
 		return err
 	}
 

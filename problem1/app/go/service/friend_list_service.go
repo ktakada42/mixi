@@ -10,6 +10,7 @@ import (
 //go:generate go run github.com/golang/mock/mockgen -source=$GOFILE -destination=../mock/mock_$GOPACKAGE/mock_$GOFILE
 
 type FriendListService interface {
+	CheckUserExist(c echo.Context) (bool, error)
 	GetFriendListByUserId(c echo.Context) ([]*model.User, error)
 }
 
@@ -21,6 +22,10 @@ func NewFriendListService(flr repository.FriendListRepository) FriendListService
 	return &friendListService{
 		flr: flr,
 	}
+}
+
+func (s *friendListService) CheckUserExist(c echo.Context) (bool, error) {
+	return s.flr.CheckUserExist(c)
 }
 
 func (s *friendListService) GetFriendListByUserId(c echo.Context) ([]*model.User, error) {

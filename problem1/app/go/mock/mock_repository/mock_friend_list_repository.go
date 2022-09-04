@@ -35,6 +35,21 @@ func (m *MockFriendListRepository) EXPECT() *MockFriendListRepositoryMockRecorde
 	return m.recorder
 }
 
+// CheckUserExist mocks base method.
+func (m *MockFriendListRepository) CheckUserExist(c echo.Context) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckUserExist", c)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CheckUserExist indicates an expected call of CheckUserExist.
+func (mr *MockFriendListRepositoryMockRecorder) CheckUserExist(c interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUserExist", reflect.TypeOf((*MockFriendListRepository)(nil).CheckUserExist), c)
+}
+
 // GetFriendListByUserId mocks base method.
 func (m *MockFriendListRepository) GetFriendListByUserId(c echo.Context) ([]*model.User, error) {
 	m.ctrl.T.Helper()

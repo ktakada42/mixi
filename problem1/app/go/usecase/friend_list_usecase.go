@@ -2,9 +2,11 @@ package usecase
 
 import (
 	"database/sql"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
 
+	"problem1/httputil"
 	"problem1/model"
 	"problem1/service"
 )
@@ -27,6 +29,22 @@ func NewFriendListUseCase(db *sql.DB, fls service.FriendListService) FriendListU
 	}
 }
 
+func (u *friendListUseCase) checkUserExist(e echo.Context) error {
+	userExist, err := u.fls.CheckUserExist(e)
+	if err != nil {
+		return err
+	}
+	if userExist {
+		return nil
+	}
+
+	return httputil.NewHTTPError(err, http.StatusBadRequest, "user not exist")
+}
+
 func (u *friendListUseCase) GetFriendListByUserId(c echo.Context) ([]*model.User, error) {
+	if err := u.checkUserExist(c); err != nil {
+		return nil, err
+	}
+
 	return u.fls.GetFriendListByUserId(c)
 }
