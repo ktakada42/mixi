@@ -50,6 +50,38 @@ WHERE user_id = ?`
 	return true, nil
 }
 
+func (r *friendListRepository) getOneHopFriendsUserIdList(c echo.Context) ([]int, error) {
+	userId := c.QueryParam("userId")
+
+	const q = `
+SELECT user2_id
+FROM friend_link
+WHERE user1_id = ?;`
+
+	rows, err := r.db.Query(q, userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var (
+		oneHopFriends []int
+		oneHopFriend  int
+	)
+	for rows.Next() {
+		if err := rows.Scan(&oneHopFriend); err != nil {
+			return nil, err
+		}
+
+		oneHopFriends = append(oneHopFriends, oneHopFriend)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return oneHopFriends, nil
+}
+
 func (r *friendListRepository) GetFriendListByUserId(c echo.Context) (*model.FriendList, error) {
 	userId := c.QueryParam("userId")
 
@@ -57,7 +89,7 @@ func (r *friendListRepository) GetFriendListByUserId(c echo.Context) (*model.Fri
 SELECT U.user_id, U.name
 FROM users AS U INNER JOIN friend_link AS FL
 ON U.user_id = FL.user2_id
-WHERE FL.user1_id = ?`
+WHERE FL.user1_id = ?;`
 
 	rows, err := r.db.Query(q, userId)
 	if err != nil {
@@ -82,37 +114,14 @@ WHERE FL.user1_id = ?`
 }
 
 func (r *friendListRepository) GetFriendListOfFriendsByUserId(c echo.Context) (*model.FriendList, error) {
-	userId := c.QueryParam("userId")
-
-	// get 1hop friends
-	const q1 = `
-SELECT user2_id
-FROM friend_link
-WHERE user1_id = ?;`
-
-	rows, err := r.db.Query(q1, userId)
+	oneHopFriends, err := r.getOneHopFriendsUserIdList(c)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
 
-	var (
-		oneHopFriends []int
-		oneHopFriend  int
-	)
-	for rows.Next() {
-		if err := rows.Scan(&oneHopFriend); err != nil {
-			return nil, err
-		}
+	userId := c.QueryParam("userId")
 
-		oneHopFriends = append(oneHopFriends, oneHopFriend)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-
-	// get 2hop Friends except for 1hop friends
-	const q2 = `
+	const q = `
 	SELECT U.user_id, U.name
 		FROM users AS U
 	INNER JOIN friend_link AS FL
@@ -124,13 +133,13 @@ WHERE user1_id = ?;`
 
 	dbx := sqlx.NewDb(r.db, "mysql")
 
-	q, args, err := sqlx.In(q2, userId, oneHopFriends)
+	query, args, err := sqlx.In(q, userId, oneHopFriends)
 	if err != nil {
 		return nil, err
 	}
 
 	var friends []*model.User
-	if err := dbx.Select(&friends, q, args...); err != nil {
+	if err := dbx.Select(&friends, query, args...); err != nil {
 		return nil, err
 	}
 

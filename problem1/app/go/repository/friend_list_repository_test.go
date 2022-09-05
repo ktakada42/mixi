@@ -12,8 +12,9 @@ import (
 )
 
 type friendListRepositoryTest struct {
-	db  *sql.DB
-	flr FriendListRepository
+	db        *sql.DB
+	flr       FriendListRepository
+	flrStruct *friendListRepository
 }
 
 func newFriendListRepositoryTest(t *testing.T) *friendListRepositoryTest {
@@ -23,8 +24,9 @@ func newFriendListRepositoryTest(t *testing.T) *friendListRepositoryTest {
 	flr := NewFriendListRepository(db)
 
 	return &friendListRepositoryTest{
-		db:  db,
-		flr: flr,
+		db:        db,
+		flr:       flr,
+		flrStruct: flr.(*friendListRepository),
 	}
 }
 
@@ -126,6 +128,74 @@ func Test_friendListRepository_CheckUserExist(t *testing.T) {
 			got, err := rt.flr.CheckUserExist(c)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("CheckUserExist() error = %v, wantErr = %v", err, tt.wantErr)
+			}
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func Test_friendListRepository_getOneHopFriendsUserIdList(t *testing.T) {
+	testUsers := []testUser{
+		{
+			userId: 123456789,
+			name:   testutil.UserNameForDebug,
+		},
+		{
+			userId: 111111,
+			name:   "hoge",
+		},
+		{
+			userId: 222222,
+			name:   "fuga",
+		},
+	}
+	testFriendLinks := []friendLink{
+		{
+			user1Id: 123456789,
+			user2Id: 111111,
+		},
+		{
+			user1Id: 123456789,
+			user2Id: 222222,
+		},
+	}
+
+	tests := []struct {
+		name    string
+		prepare func(*friendListRepositoryTest)
+		param   string
+		want    []int
+		wantErr bool
+	}{
+		{
+			name: "ok",
+			prepare: func(rt *friendListRepositoryTest) {
+				for _, tu := range testUsers {
+					rt.insertTestUserList(t, rt.db, tu)
+				}
+				for _, fl := range testFriendLinks {
+					rt.insertTestFriendLink(t, rt.db, fl)
+				}
+			},
+			param:   "/?userId=123456789",
+			want:    []int{111111, 222222},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rt := newFriendListRepositoryTest(t)
+			tt.prepare(rt)
+
+			c, err := httputil.SetUpContext(tt.param)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			got, err := rt.flrStruct.getOneHopFriendsUserIdList(c)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("getOneHopFrinedsUserIDList() error = %v, wantErr = %v", err, tt.wantErr)
 			}
 			assert.Equal(t, tt.want, got)
 		})
