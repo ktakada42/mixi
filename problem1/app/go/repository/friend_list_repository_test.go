@@ -202,7 +202,6 @@ func Test_friendListRepository_GetFriendListByUserId(t *testing.T) {
 }
 
 func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
-	want := newFriendList()
 	testUsers := []testUser{
 		{
 			userId: 123456789,
@@ -216,6 +215,10 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
 			userId: 222222,
 			name:   "fuga",
 		},
+		{
+			userId: 333333,
+			name:   "bar",
+		},
 	}
 	testFriendLinks := []friendLink{
 		{
@@ -223,16 +226,16 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
 			user2Id: 111111,
 		},
 		{
-			user1Id: 123456789,
-			user2Id: 222222,
-		},
-		{
 			user1Id: 111111,
 			user2Id: 222222,
 		},
 		{
-			user1Id: 222222,
-			user2Id: 111111,
+			user1Id: 111111,
+			user2Id: 333333,
+		},
+		{
+			user1Id: 123456789,
+			user2Id: 333333,
 		},
 	}
 
@@ -253,8 +256,15 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
 					rt.insertTestFriendLink(t, rt.db, fl)
 				}
 			},
-			param:   "/?userId=123456789",
-			want:    want,
+			param: "/?userId=123456789",
+			want: &model.FriendList{
+				Friends: []*model.User{
+					{
+						Id:   222222,
+						Name: "fuga",
+					},
+				},
+			},
 			wantErr: false,
 		},
 	}
