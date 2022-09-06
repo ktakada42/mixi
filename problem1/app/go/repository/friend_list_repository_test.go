@@ -65,12 +65,12 @@ VALUES (0, ?, ?)`
 	testutil.ExecSQL(t, db, q, testRecord...)
 }
 
-type friendLink struct {
+type userLink struct {
 	user1Id int
 	user2Id int
 }
 
-func (r *friendListRepositoryTest) insertTestFriendLink(t *testing.T, db *sql.DB, fl friendLink) {
+func (r *friendListRepositoryTest) insertTestFriendLink(t *testing.T, db *sql.DB, ul userLink) {
 	t.Helper()
 
 	const q = `
@@ -78,8 +78,23 @@ INSERT INTO friend_link (id, user1_id, user2_id)
 VALUES (0, ?, ?)`
 
 	testRecord := []any{
-		fl.user1Id,
-		fl.user2Id,
+		ul.user1Id,
+		ul.user2Id,
+	}
+	testutil.ValidateSQLArgs(t, q, testRecord...)
+	testutil.ExecSQL(t, db, q, testRecord...)
+}
+
+func (r *friendListRepositoryTest) insertTestBlockList(t *testing.T, db *sql.DB, ul userLink) {
+	t.Helper()
+
+	const q = `
+INSERT INTO block_list (id, user1_id, user2_id)
+VALUES (0, ?, ?)`
+
+	testRecord := []any{
+		ul.user1Id,
+		ul.user2Id,
 	}
 	testutil.ValidateSQLArgs(t, q, testRecord...)
 	testutil.ExecSQL(t, db, q, testRecord...)
@@ -149,7 +164,7 @@ func Test_friendListRepository_getOneHopFriendsUserIdList(t *testing.T) {
 			name:   "fuga",
 		},
 	}
-	testFriendLinks := []friendLink{
+	testFriendLinks := []userLink{
 		{
 			user1Id: 123456789,
 			user2Id: 111111,
@@ -202,6 +217,83 @@ func Test_friendListRepository_getOneHopFriendsUserIdList(t *testing.T) {
 	}
 }
 
+func Test_friendListRepository_getBlockUsersIdList(t *testing.T) {
+	testUsers := []testUser{
+		{
+			userId: 123456789,
+			name:   testutil.UserNameForDebug,
+		},
+		{
+			userId: 111111,
+			name:   "hoge",
+		},
+		{
+			userId: 222222,
+			name:   "fuga",
+		},
+	}
+	testFriendLinks := []userLink{
+		{
+			user1Id: 123456789,
+			user2Id: 111111,
+		},
+		{
+			user1Id: 123456789,
+			user2Id: 222222,
+		},
+	}
+	testBlockLists := []userLink{
+		{
+			user1Id: 123456789,
+			user2Id: 111111,
+		},
+	}
+
+	tests := []struct {
+		name    string
+		prepare func(*friendListRepositoryTest)
+		param   string
+		want    []int
+		wantErr bool
+	}{
+		{
+			name: "ok",
+			prepare: func(rt *friendListRepositoryTest) {
+				for _, tu := range testUsers {
+					rt.insertTestUserList(t, rt.db, tu)
+				}
+				for _, fl := range testFriendLinks {
+					rt.insertTestFriendLink(t, rt.db, fl)
+				}
+				for _, bl := range testBlockLists {
+					rt.insertTestBlockList(t, rt.db, bl)
+				}
+			},
+			param:   "/?userId=123456789",
+			want:    []int{111111},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rt := newFriendListRepositoryTest(t)
+			tt.prepare(rt)
+
+			c, err := httputil.SetUpContext(tt.param)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			got, err := rt.flrStruct.getBlockUsersIdList(c)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("getBlockUsersIdList() error = %v, wantErr = %v", err, tt.wantErr)
+			}
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
 func Test_friendListRepository_GetFriendListByUserId(t *testing.T) {
 	want := newFriendList()
 	testUsers := []testUser{
@@ -218,7 +310,7 @@ func Test_friendListRepository_GetFriendListByUserId(t *testing.T) {
 			name:   "fuga",
 		},
 	}
-	testFriendLinks := []friendLink{
+	testFriendLinks := []userLink{
 		{
 			user1Id: 123456789,
 			user2Id: 111111,
@@ -290,7 +382,7 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
 			name:   "bar",
 		},
 	}
-	testFriendLinks := []friendLink{
+	testFriendLinks := []userLink{
 		{
 			user1Id: 123456789,
 			user2Id: 111111,
