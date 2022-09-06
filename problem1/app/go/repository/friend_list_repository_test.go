@@ -50,6 +50,27 @@ type testUser struct {
 	name   string
 }
 
+func newTestUsers() []testUser {
+	return []testUser{
+		{
+			userId: 123456789,
+			name:   testutil.UserNameForDebug,
+		},
+		{
+			userId: 111111,
+			name:   "hoge",
+		},
+		{
+			userId: 222222,
+			name:   "fuga",
+		},
+		{
+			userId: 333333,
+			name:   "bar",
+		},
+	}
+}
+
 func (r *friendListRepositoryTest) insertTestUserList(t *testing.T, db *sql.DB, tu testUser) {
 	t.Helper()
 
@@ -68,6 +89,24 @@ VALUES (0, ?, ?)`
 type userLink struct {
 	user1Id int
 	user2Id int
+}
+
+func newTestUserLink() []userLink {
+	return []userLink{
+		{
+			user1Id: 123456789,
+			user2Id: 111111,
+		},
+		{
+			user1Id: 123456789,
+			user2Id: 222222,
+		},
+		{
+			user1Id: 123456789,
+			user2Id: 333333,
+		},
+	}
+
 }
 
 func (r *friendListRepositoryTest) insertTestFriendLink(t *testing.T, db *sql.DB, ul userLink) {
@@ -150,30 +189,8 @@ func Test_friendListRepository_CheckUserExist(t *testing.T) {
 }
 
 func Test_friendListRepository_getOneHopFriendsUserIdList(t *testing.T) {
-	testUsers := []testUser{
-		{
-			userId: 123456789,
-			name:   testutil.UserNameForDebug,
-		},
-		{
-			userId: 111111,
-			name:   "hoge",
-		},
-		{
-			userId: 222222,
-			name:   "fuga",
-		},
-	}
-	testFriendLinks := []userLink{
-		{
-			user1Id: 123456789,
-			user2Id: 111111,
-		},
-		{
-			user1Id: 123456789,
-			user2Id: 222222,
-		},
-	}
+	testUsers := newTestUsers()
+	testUserLink := newTestUserLink()
 
 	tests := []struct {
 		name    string
@@ -188,12 +205,23 @@ func Test_friendListRepository_getOneHopFriendsUserIdList(t *testing.T) {
 				for _, tu := range testUsers {
 					rt.insertTestUserList(t, rt.db, tu)
 				}
-				for _, fl := range testFriendLinks {
-					rt.insertTestFriendLink(t, rt.db, fl)
+				for _, ul := range testUserLink {
+					rt.insertTestFriendLink(t, rt.db, ul)
 				}
 			},
 			param:   "/?userId=123456789",
-			want:    []int{111111, 222222},
+			want:    []int{111111, 222222, 333333},
+			wantErr: false,
+		},
+		{
+			name: "ok: no 1hop friend",
+			prepare: func(rt *friendListRepositoryTest) {
+				for _, tu := range testUsers {
+					rt.insertTestUserList(t, rt.db, tu)
+				}
+			},
+			param:   "/?userId=123456789",
+			want:    nil,
 			wantErr: false,
 		},
 	}
@@ -218,36 +246,8 @@ func Test_friendListRepository_getOneHopFriendsUserIdList(t *testing.T) {
 }
 
 func Test_friendListRepository_getBlockUsersIdList(t *testing.T) {
-	testUsers := []testUser{
-		{
-			userId: 123456789,
-			name:   testutil.UserNameForDebug,
-		},
-		{
-			userId: 111111,
-			name:   "hoge",
-		},
-		{
-			userId: 222222,
-			name:   "fuga",
-		},
-	}
-	testFriendLinks := []userLink{
-		{
-			user1Id: 123456789,
-			user2Id: 111111,
-		},
-		{
-			user1Id: 123456789,
-			user2Id: 222222,
-		},
-	}
-	testBlockLists := []userLink{
-		{
-			user1Id: 123456789,
-			user2Id: 111111,
-		},
-	}
+	testUsers := newTestUsers()
+	testUserLink := newTestUserLink()
 
 	tests := []struct {
 		name    string
@@ -257,20 +257,52 @@ func Test_friendListRepository_getBlockUsersIdList(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "ok",
+			name: "ok: 1 user blocked",
 			prepare: func(rt *friendListRepositoryTest) {
 				for _, tu := range testUsers {
 					rt.insertTestUserList(t, rt.db, tu)
 				}
-				for _, fl := range testFriendLinks {
-					rt.insertTestFriendLink(t, rt.db, fl)
+				for _, ul := range testUserLink {
+					rt.insertTestFriendLink(t, rt.db, ul)
 				}
-				for _, bl := range testBlockLists {
-					rt.insertTestBlockList(t, rt.db, bl)
-				}
+				rt.insertTestBlockList(t, rt.db, userLink{
+					user1Id: 123456789,
+					user2Id: 111111,
+				})
 			},
 			param:   "/?userId=123456789",
 			want:    []int{111111},
+			wantErr: false,
+		},
+		{
+			name: "ok: all users blocked",
+			prepare: func(rt *friendListRepositoryTest) {
+				for _, tu := range testUsers {
+					rt.insertTestUserList(t, rt.db, tu)
+				}
+				for _, ul := range testUserLink {
+					rt.insertTestFriendLink(t, rt.db, ul)
+				}
+				for _, ul := range testUserLink {
+					rt.insertTestBlockList(t, rt.db, ul)
+				}
+			},
+			param:   "/?userId=123456789",
+			want:    []int{111111, 222222, 333333},
+			wantErr: false,
+		},
+		{
+			name: "ok: no user blocked",
+			prepare: func(rt *friendListRepositoryTest) {
+				for _, tu := range testUsers {
+					rt.insertTestUserList(t, rt.db, tu)
+				}
+				for _, ul := range testUserLink {
+					rt.insertTestFriendLink(t, rt.db, ul)
+				}
+			},
+			param:   "/?userId=123456789",
+			want:    nil,
 			wantErr: false,
 		},
 	}
@@ -294,32 +326,89 @@ func Test_friendListRepository_getBlockUsersIdList(t *testing.T) {
 	}
 }
 
+func Test_friendListRepository_getFriendListByUserIdExcludingBlockUsers(t *testing.T) {
+	testUsers := newTestUsers()
+	testUserLink := newTestUserLink()
+
+	tests := []struct {
+		name    string
+		prepare func(*friendListRepositoryTest)
+		arg     []int
+		param   string
+		want    *model.FriendList
+		wantErr bool
+	}{
+		{
+			name: "ok: 1 friend blocked",
+			prepare: func(rt *friendListRepositoryTest) {
+				for _, tu := range testUsers {
+					rt.insertTestUserList(t, rt.db, tu)
+				}
+				for _, ul := range testUserLink {
+					rt.insertTestFriendLink(t, rt.db, ul)
+				}
+			},
+			arg:     []int{333333},
+			param:   "/?userId=123456789",
+			want:    newFriendList(),
+			wantErr: false,
+		},
+		{
+			name: "ok: all friends blocked",
+			prepare: func(rt *friendListRepositoryTest) {
+				for _, tu := range testUsers {
+					rt.insertTestUserList(t, rt.db, tu)
+				}
+				for _, ul := range testUserLink {
+					rt.insertTestFriendLink(t, rt.db, ul)
+				}
+			},
+			arg:   []int{111111, 222222, 333333},
+			param: "/?userId=123456789",
+			want: &model.FriendList{
+				Friends: []*model.User(nil),
+			},
+			wantErr: false,
+		},
+		{
+			name: "ng: no friend blocked",
+			prepare: func(rt *friendListRepositoryTest) {
+				for _, tu := range testUsers {
+					rt.insertTestUserList(t, rt.db, tu)
+				}
+				for _, ul := range testUserLink {
+					rt.insertTestFriendLink(t, rt.db, ul)
+				}
+			},
+			arg:     nil,
+			param:   "/?userId=123456789",
+			want:    nil,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rt := newFriendListRepositoryTest(t)
+			tt.prepare(rt)
+
+			c, err := httputil.SetUpContext(tt.param)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			got, err := rt.flrStruct.getFriendListByUserIdExcludingBlockUsers(c, tt.arg)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("GetFriendListByUserId() error = %v, wantErr = %v", err, tt.wantErr)
+			}
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
 func Test_friendListRepository_GetFriendListByUserId(t *testing.T) {
-	want := newFriendList()
-	testUsers := []testUser{
-		{
-			userId: 123456789,
-			name:   testutil.UserNameForDebug,
-		},
-		{
-			userId: 111111,
-			name:   "hoge",
-		},
-		{
-			userId: 222222,
-			name:   "fuga",
-		},
-	}
-	testFriendLinks := []userLink{
-		{
-			user1Id: 123456789,
-			user2Id: 111111,
-		},
-		{
-			user1Id: 123456789,
-			user2Id: 222222,
-		},
-	}
+	testUsers := newTestUsers()
+	testUserLink := newTestUserLink()
 
 	tests := []struct {
 		name    string
@@ -329,17 +418,54 @@ func Test_friendListRepository_GetFriendListByUserId(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "ok",
+			name: "ok: 1 friend blocked",
 			prepare: func(rt *friendListRepositoryTest) {
 				for _, tu := range testUsers {
 					rt.insertTestUserList(t, rt.db, tu)
 				}
-				for _, fl := range testFriendLinks {
-					rt.insertTestFriendLink(t, rt.db, fl)
+				for _, ul := range testUserLink {
+					rt.insertTestFriendLink(t, rt.db, ul)
+				}
+				rt.insertTestBlockList(t, rt.db, userLink{
+					user1Id: 123456789,
+					user2Id: 333333,
+				})
+			},
+			param:   "/?userId=123456789",
+			want:    newFriendList(),
+			wantErr: false,
+		},
+		{
+			name: "ok: all friends blocked",
+			prepare: func(rt *friendListRepositoryTest) {
+				for _, tu := range testUsers {
+					rt.insertTestUserList(t, rt.db, tu)
+				}
+				for _, ul := range testUserLink {
+					rt.insertTestFriendLink(t, rt.db, ul)
+				}
+				for _, ul := range testUserLink {
+					rt.insertTestBlockList(t, rt.db, ul)
+				}
+			},
+			param: "/?userId=123456789",
+			want: &model.FriendList{
+				Friends: []*model.User(nil),
+			},
+			wantErr: false,
+		},
+		{
+			name: "ok: no friend blocked",
+			prepare: func(rt *friendListRepositoryTest) {
+				for _, tu := range testUsers {
+					rt.insertTestUserList(t, rt.db, tu)
+				}
+				for i := 0; i < 2; i++ {
+					rt.insertTestFriendLink(t, rt.db, testUserLink[i])
 				}
 			},
 			param:   "/?userId=123456789",
-			want:    want,
+			want:    newFriendList(),
 			wantErr: false,
 		},
 	}
@@ -363,30 +489,10 @@ func Test_friendListRepository_GetFriendListByUserId(t *testing.T) {
 	}
 }
 
-func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
-	testUsers := []testUser{
-		{
-			userId: 123456789,
-			name:   testutil.UserNameForDebug,
-		},
-		{
-			userId: 111111,
-			name:   "hoge",
-		},
-		{
-			userId: 222222,
-			name:   "fuga",
-		},
-		{
-			userId: 333333,
-			name:   "bar",
-		},
-	}
-	testFriendLinks := []userLink{
-		{
-			user1Id: 123456789,
-			user2Id: 111111,
-		},
+func Test_friendListRepository_getFriendListOfFriendsByUserIdExcludingOneHopFriendsAndBlockUsers(t *testing.T) {
+	testUsers := newTestUsers()
+	testUserLink := newTestUserLink()
+	testUserLink2 := []userLink{
 		{
 			user1Id: 111111,
 			user2Id: 222222,
@@ -396,10 +502,111 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
 			user2Id: 333333,
 		},
 		{
+			user1Id: 222222,
+			user2Id: 111111,
+		},
+	}
+
+	tests := []struct {
+		name    string
+		prepare func(*friendListRepositoryTest)
+		arg     []int
+		param   string
+		want    *model.FriendList
+		wantErr bool
+	}{
+		{
+			name: "ok: 1 friend excluded",
+			prepare: func(rt *friendListRepositoryTest) {
+				for _, tu := range testUsers {
+					rt.insertTestUserList(t, rt.db, tu)
+				}
+				for _, ul := range testUserLink {
+					rt.insertTestFriendLink(t, rt.db, ul)
+				}
+				for _, ul := range testUserLink2 {
+					rt.insertTestFriendLink(t, rt.db, ul)
+				}
+			},
+			arg:     []int{333333},
+			param:   "/?userId=123456789",
+			want:    newFriendList(),
+			wantErr: false,
+		},
+		{
+			name: "ok: all friends excluded",
+			prepare: func(rt *friendListRepositoryTest) {
+				for _, tu := range testUsers {
+					rt.insertTestUserList(t, rt.db, tu)
+				}
+				for _, ul := range testUserLink {
+					rt.insertTestFriendLink(t, rt.db, ul)
+				}
+			},
+			arg:   []int{111111, 222222, 333333},
+			param: "/?userId=123456789",
+			want: &model.FriendList{
+				Friends: []*model.User(nil),
+			},
+			wantErr: false,
+		},
+		{
+			name: "ng: no friend excluded",
+			prepare: func(rt *friendListRepositoryTest) {
+				for _, tu := range testUsers {
+					rt.insertTestUserList(t, rt.db, tu)
+				}
+				for _, ul := range testUserLink {
+					rt.insertTestFriendLink(t, rt.db, ul)
+				}
+			},
+			arg:     nil,
+			param:   "/?userId=123456789",
+			want:    nil,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rt := newFriendListRepositoryTest(t)
+			tt.prepare(rt)
+
+			c, err := httputil.SetUpContext(tt.param)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			got, err := rt.flrStruct.getFriendListOfFriendsByUserIdExcludingOneHopFriendsAndBlockUsers(c, tt.arg)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("GetFriendListByUserId() error = %v, wantErr = %v", err, tt.wantErr)
+			}
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
+	testUsers := newTestUsers()
+	testUserLink := []userLink{
+		{
 			user1Id: 123456789,
+			user2Id: 444444,
+		},
+		{
+			user1Id: 444444,
+			user2Id: 111111,
+		},
+		{
+			user1Id: 444444,
+			user2Id: 222222,
+		},
+		{
+			user1Id: 444444,
 			user2Id: 333333,
 		},
 	}
+	testUserLink2 := newTestUserLink()
 
 	tests := []struct {
 		name    string
@@ -409,23 +616,94 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "ok",
+			name: "ok: 1 friend excluded",
 			prepare: func(rt *friendListRepositoryTest) {
 				for _, tu := range testUsers {
 					rt.insertTestUserList(t, rt.db, tu)
 				}
-				for _, fl := range testFriendLinks {
-					rt.insertTestFriendLink(t, rt.db, fl)
+				rt.insertTestUserList(t, rt.db, testUser{
+					userId: 444444,
+					name:   "piyo",
+				})
+				for _, ul := range testUserLink {
+					rt.insertTestFriendLink(t, rt.db, ul)
+				}
+				rt.insertTestBlockList(t, rt.db, userLink{
+					user1Id: 123456789,
+					user2Id: 333333,
+				})
+			},
+			param:   "/?userId=123456789",
+			want:    newFriendList(),
+			wantErr: false,
+		},
+		{
+			name: "ok: all friends excluded",
+			prepare: func(rt *friendListRepositoryTest) {
+				for _, tu := range testUsers {
+					rt.insertTestUserList(t, rt.db, tu)
+				}
+				rt.insertTestUserList(t, rt.db, testUser{
+					userId: 444444,
+					name:   "piyo",
+				})
+				for _, ul := range testUserLink {
+					rt.insertTestFriendLink(t, rt.db, ul)
+				}
+				for _, ul := range testUserLink2 {
+					rt.insertTestFriendLink(t, rt.db, ul)
 				}
 			},
 			param: "/?userId=123456789",
 			want: &model.FriendList{
-				Friends: []*model.User{
-					{
-						Id:   222222,
-						Name: "fuga",
-					},
-				},
+				Friends: []*model.User(nil),
+			},
+			wantErr: false,
+		},
+		{
+			name: "ok: no friend excluded",
+			prepare: func(rt *friendListRepositoryTest) {
+				for _, tu := range testUsers {
+					rt.insertTestUserList(t, rt.db, tu)
+				}
+				rt.insertTestUserList(t, rt.db, testUser{
+					userId: 444444,
+					name:   "piyo",
+				})
+				for i := 0; i < 3; i++ {
+					rt.insertTestFriendLink(t, rt.db, testUserLink[i])
+				}
+			},
+			param:   "/?userId=123456789",
+			want:    newFriendList(),
+			wantErr: false,
+		},
+		{
+			name: "ok: have no 2hop friend",
+			prepare: func(rt *friendListRepositoryTest) {
+				for _, tu := range testUsers {
+					rt.insertTestUserList(t, rt.db, tu)
+				}
+				for _, ul := range testUserLink2 {
+					rt.insertTestFriendLink(t, rt.db, ul)
+				}
+			},
+			param: "/?userId=123456789",
+			want: &model.FriendList{
+				Friends: []*model.User(nil),
+			},
+			wantErr: false,
+		},
+		{
+			name: "ok: have no friend",
+			prepare: func(rt *friendListRepositoryTest) {
+				for _, tu := range testUsers {
+					rt.insertTestUserList(t, rt.db, tu)
+				}
+			},
+			param: "/?userId=123456789",
+			want: &model.FriendList{
+				Friends: []*model.User(nil),
 			},
 			wantErr: false,
 		},
