@@ -82,6 +82,38 @@ WHERE user1_id = ?;`
 	return oneHopFriends, nil
 }
 
+func (r *friendListRepository) getBlockUsersIdList(c echo.Context) ([]int, error) {
+	userId := c.QueryParam("userId")
+
+	const q = `
+SELECT user2_id
+FROM block_list
+WHERE user1_id = ?;`
+
+	rows, err := r.db.Query(q, userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var (
+		blockUsers []int
+		blockUser  int
+	)
+	for rows.Next() {
+		if err := rows.Scan(&blockUser); err != nil {
+			return nil, err
+		}
+
+		blockUsers = append(blockUsers, blockUser)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return blockUsers, nil
+}
+
 func (r *friendListRepository) GetFriendListByUserId(c echo.Context) (*model.FriendList, error) {
 	userId := c.QueryParam("userId")
 
