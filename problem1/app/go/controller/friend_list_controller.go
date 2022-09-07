@@ -15,6 +15,7 @@ import (
 type FriendListController interface {
 	GetFriendListByUserId(c echo.Context) error
 	GetFriendListOfFriendsByUserId(c echo.Context) error
+	GetFriendListOfFriendsByUserIdWithPaging(c echo.Context) error
 }
 
 type friendListController struct {
@@ -66,6 +67,28 @@ func (c *friendListController) GetFriendListOfFriendsByUserId(ctx echo.Context) 
 	ctx.Set("userId", userId)
 
 	friendList, err := c.friendListUseCase.GetFriendListOfFriendsByUserId(ctx)
+	if err != nil {
+		httputil.RespondError(ctx, err)
+		return err
+	}
+
+	httputil.RespondJSON(ctx, http.StatusOK, friendList)
+	return nil
+}
+
+func (c *friendListController) GetFriendListOfFriendsByUserIdWithPaging(ctx echo.Context) error {
+	userId, err := strconv.Atoi(ctx.QueryParam("ID"))
+	if err != nil {
+		httputil.RespondError(ctx, httputil.NewHTTPError(err, http.StatusBadRequest, "userId is not integer or not exist in query parameter"))
+		return err
+	}
+	if userId < 0 || maxUserId < userId {
+		httputil.RespondError(ctx, httputil.NewHTTPError(err, http.StatusBadRequest, "userId is invalid"))
+		return err
+	}
+	ctx.Set("userId", userId)
+
+	friendList, err := c.friendListUseCase.GetFriendListOfFriendsByUserIdWithPaging(ctx)
 	if err != nil {
 		httputil.RespondError(ctx, err)
 		return err

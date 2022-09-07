@@ -13,6 +13,7 @@ type FriendListService interface {
 	CheckUserExist(c echo.Context) (bool, error)
 	GetFriendListByUserId(c echo.Context) (*model.FriendList, error)
 	GetFriendListOfFriendsByUserId(c echo.Context) (*model.FriendList, error)
+	GetFriendListOfFriendsByUserIdWithPaging(c echo.Context) (*model.FriendList, error)
 }
 
 type friendListService struct {
@@ -35,4 +36,7 @@ func (s *friendListService) GetFriendListByUserId(c echo.Context) (*model.Friend
 
 func (s *friendListService) GetFriendListOfFriendsByUserId(c echo.Context) (*model.FriendList, error) {
 	return s.flr.GetFriendListOfFriendsByUserId(c)
+}
+func (s *friendListService) GetFriendListOfFriendsByUserIdWithPaging(c echo.Context) (*model.FriendList, error) {
+	return s.flr.GetFriendListOfFriendsByUserIdWithPaging(c)
 }

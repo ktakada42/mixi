@@ -7,10 +7,10 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 
 	"problem1/configs"
 	"problem1/controller"
+	"problem1/httputil/middleware"
 	"problem1/repository"
 	"problem1/service"
 	"problem1/usecase"
@@ -32,7 +32,7 @@ func main() {
 
 	e := echo.New()
 
-	e.Use(middleware.Logger())
+	e.Use(middleware.PagingFunc)
 
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "minimal_sns_app")
@@ -47,7 +47,7 @@ func main() {
 	})
 
 	e.GET("/get_friend_of_friend_list_paging", func(c echo.Context) error {
-		return nil
+		return friendListController.GetFriendListOfFriendsByUserIdWithPaging(c)
 	})
 
 	e.Logger.Fatal(e.Start(":" + strconv.Itoa(conf.Server.Port)))
