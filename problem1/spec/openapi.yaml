@@ -52,8 +52,58 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPError"
+  /get_friend_of_friend_list_paging:
+    get:
+      description: "ページネーションを含めて指定したユーザのフレンドのフレンドのリストを返す"
+      summary: "get friend list of friends of specified user"
+      parameters:
+        - name: ID
+          in: query
+          required: true
+          description: "フレンドリストを取得したいユーザの id を指定する"
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "200":
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FriendList"
+        "400":
+          description: "User not exist"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPError"
 components:
+  parameters:
+    limit:
+      name: limit
+      in: query
+      description: "paging limit"
+      required: false
+      schema:
+        $ref: "#/components/schemas/limit"
+    page:
+      name: page
+      in: query
+      description: "start page"
+      required: false
+      schema:
+        $ref: "#/components/schemas/page"
   schemas:
+    limit:
+      type: integer
+      example: 20
+      default: 20
+      maximum: 100
+    page:
+      type: integer
+      example: 1
+      default: 1
     HTTPError:
       type: object
       properties:
