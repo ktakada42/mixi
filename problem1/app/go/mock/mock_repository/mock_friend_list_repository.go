@@ -9,7 +9,6 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	echo "github.com/labstack/echo/v4"
 )
 
 // MockFriendListRepository is a mock of FriendListRepository interface.
@@ -36,46 +35,106 @@ func (m *MockFriendListRepository) EXPECT() *MockFriendListRepositoryMockRecorde
 }
 
 // CheckUserExist mocks base method.
-func (m *MockFriendListRepository) CheckUserExist(c echo.Context) (bool, error) {
+func (m *MockFriendListRepository) CheckUserExist(userId int) (bool, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CheckUserExist", c)
+	ret := m.ctrl.Call(m, "CheckUserExist", userId)
 	ret0, _ := ret[0].(bool)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CheckUserExist indicates an expected call of CheckUserExist.
-func (mr *MockFriendListRepositoryMockRecorder) CheckUserExist(c interface{}) *gomock.Call {
+func (mr *MockFriendListRepositoryMockRecorder) CheckUserExist(userId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUserExist", reflect.TypeOf((*MockFriendListRepository)(nil).CheckUserExist), c)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUserExist", reflect.TypeOf((*MockFriendListRepository)(nil).CheckUserExist), userId)
+}
+
+// GetBlockUsersIdList mocks base method.
+func (m *MockFriendListRepository) GetBlockUsersIdList(userId int) ([]int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBlockUsersIdList", userId)
+	ret0, _ := ret[0].([]int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetBlockUsersIdList indicates an expected call of GetBlockUsersIdList.
+func (mr *MockFriendListRepositoryMockRecorder) GetBlockUsersIdList(userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBlockUsersIdList", reflect.TypeOf((*MockFriendListRepository)(nil).GetBlockUsersIdList), userId)
 }
 
 // GetFriendListByUserId mocks base method.
-func (m *MockFriendListRepository) GetFriendListByUserId(c echo.Context) (*model.FriendList, error) {
+func (m *MockFriendListRepository) GetFriendListByUserId(userId int) (*model.FriendList, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFriendListByUserId", c)
+	ret := m.ctrl.Call(m, "GetFriendListByUserId", userId)
 	ret0, _ := ret[0].(*model.FriendList)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetFriendListByUserId indicates an expected call of GetFriendListByUserId.
-func (mr *MockFriendListRepositoryMockRecorder) GetFriendListByUserId(c interface{}) *gomock.Call {
+func (mr *MockFriendListRepositoryMockRecorder) GetFriendListByUserId(userId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFriendListByUserId", reflect.TypeOf((*MockFriendListRepository)(nil).GetFriendListByUserId), c)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFriendListByUserId", reflect.TypeOf((*MockFriendListRepository)(nil).GetFriendListByUserId), userId)
+}
+
+// GetFriendListByUserIdExcludingBlockUsers mocks base method.
+func (m *MockFriendListRepository) GetFriendListByUserIdExcludingBlockUsers(userId int, blockUsers []int) (*model.FriendList, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFriendListByUserIdExcludingBlockUsers", userId, blockUsers)
+	ret0, _ := ret[0].(*model.FriendList)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetFriendListByUserIdExcludingBlockUsers indicates an expected call of GetFriendListByUserIdExcludingBlockUsers.
+func (mr *MockFriendListRepositoryMockRecorder) GetFriendListByUserIdExcludingBlockUsers(userId, blockUsers interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFriendListByUserIdExcludingBlockUsers", reflect.TypeOf((*MockFriendListRepository)(nil).GetFriendListByUserIdExcludingBlockUsers), userId, blockUsers)
 }
 
 // GetFriendListOfFriendsByUserId mocks base method.
-func (m *MockFriendListRepository) GetFriendListOfFriendsByUserId(c echo.Context) (*model.FriendList, error) {
+func (m *MockFriendListRepository) GetFriendListOfFriendsByUserId(userId int, excludeUsers []int) (*model.FriendList, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFriendListOfFriendsByUserId", c)
+	ret := m.ctrl.Call(m, "GetFriendListOfFriendsByUserId", userId, excludeUsers)
 	ret0, _ := ret[0].(*model.FriendList)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetFriendListOfFriendsByUserId indicates an expected call of GetFriendListOfFriendsByUserId.
-func (mr *MockFriendListRepositoryMockRecorder) GetFriendListOfFriendsByUserId(c interface{}) *gomock.Call {
+func (mr *MockFriendListRepositoryMockRecorder) GetFriendListOfFriendsByUserId(userId, excludeUsers interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFriendListOfFriendsByUserId", reflect.TypeOf((*MockFriendListRepository)(nil).GetFriendListOfFriendsByUserId), c)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFriendListOfFriendsByUserId", reflect.TypeOf((*MockFriendListRepository)(nil).GetFriendListOfFriendsByUserId), userId, excludeUsers)
+}
+
+// GetFriendListOfFriendsByUserIdWithPaging mocks base method.
+func (m *MockFriendListRepository) GetFriendListOfFriendsByUserIdWithPaging(userId int, excludeUsers []int, limit, offset int) (*model.FriendList, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFriendListOfFriendsByUserIdWithPaging", userId, excludeUsers, limit, offset)
+	ret0, _ := ret[0].(*model.FriendList)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetFriendListOfFriendsByUserIdWithPaging indicates an expected call of GetFriendListOfFriendsByUserIdWithPaging.
+func (mr *MockFriendListRepositoryMockRecorder) GetFriendListOfFriendsByUserIdWithPaging(userId, excludeUsers, limit, offset interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFriendListOfFriendsByUserIdWithPaging", reflect.TypeOf((*MockFriendListRepository)(nil).GetFriendListOfFriendsByUserIdWithPaging), userId, excludeUsers, limit, offset)
+}
+
+// GetOneHopFriendsUserIdList mocks base method.
+func (m *MockFriendListRepository) GetOneHopFriendsUserIdList(userId int) ([]int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetOneHopFriendsUserIdList", userId)
+	ret0, _ := ret[0].([]int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetOneHopFriendsUserIdList indicates an expected call of GetOneHopFriendsUserIdList.
+func (mr *MockFriendListRepositoryMockRecorder) GetOneHopFriendsUserIdList(userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOneHopFriendsUserIdList", reflect.TypeOf((*MockFriendListRepository)(nil).GetOneHopFriendsUserIdList), userId)
 }

@@ -5,7 +5,6 @@ import (
 	"errors"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/labstack/echo/v4"
 
 	"problem1/model"
 )
@@ -13,10 +12,13 @@ import (
 //go:generate go run github.com/golang/mock/mockgen -source=$GOFILE -destination=../mock/mock_$GOPACKAGE/mock_$GOFILE
 
 type FriendListRepository interface {
-	CheckUserExist(c echo.Context) (bool, error)
-	GetFriendListByUserId(c echo.Context) (*model.FriendList, error)
-	GetFriendListOfFriendsByUserId(c echo.Context) (*model.FriendList, error)
-	GetFriendListOfFriendsByUserIdWithPaging(c echo.Context) (*model.FriendList, error)
+	CheckUserExist(userId int) (bool, error)
+	GetOneHopFriendsUserIdList(userId int) ([]int, error)
+	GetBlockUsersIdList(userId int) ([]int, error)
+	GetFriendListByUserId(userId int) (*model.FriendList, error)
+	GetFriendListByUserIdExcludingBlockUsers(userId int, blockUsers []int) (*model.FriendList, error)
+	GetFriendListOfFriendsByUserId(userId int, excludeUsers []int) (*model.FriendList, error)
+	GetFriendListOfFriendsByUserIdWithPaging(userId int, excludeUsers []int, limit, offset int) (*model.FriendList, error)
 }
 
 type friendListRepository struct {
@@ -29,13 +31,13 @@ func NewFriendListRepository(db *sql.DB) FriendListRepository {
 	}
 }
 
-func (r *friendListRepository) CheckUserExist(c echo.Context) (bool, error) {
+func (r *friendListRepository) CheckUserExist(userId int) (bool, error) {
 	const q = `
-SELECT user_id, name
-FROM users
-WHERE user_id = ?`
+	SELECT user_id, name
+	FROM users
+	WHERE user_id = ?`
 
-	row := r.db.QueryRow(q, c.Get("userId"))
+	row := r.db.QueryRow(q, userId)
 
 	user := &model.User{}
 	if err := row.Scan(&user.Id, &user.Name); err != nil {
@@ -49,13 +51,13 @@ WHERE user_id = ?`
 	return true, nil
 }
 
-func (r *friendListRepository) getOneHopFriendsUserIdList(c echo.Context) ([]int, error) {
+func (r *friendListRepository) GetOneHopFriendsUserIdList(userId int) ([]int, error) {
 	const q = `
-SELECT user2_id
-FROM friend_link
-WHERE user1_id = ?;`
+	SELECT user2_id
+	FROM friend_link
+	WHERE user1_id = ?;`
 
-	rows, err := r.db.Query(q, c.Get("userId"))
+	rows, err := r.db.Query(q, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -79,13 +81,13 @@ WHERE user1_id = ?;`
 	return oneHopFriends, nil
 }
 
-func (r *friendListRepository) getBlockUsersIdList(c echo.Context) ([]int, error) {
+func (r *friendListRepository) GetBlockUsersIdList(userId int) ([]int, error) {
 	const q = `
-SELECT user2_id
-FROM block_list
-WHERE user1_id = ?;`
+	SELECT user2_id
+	FROM block_list
+	WHERE user1_id = ?;`
 
-	rows, err := r.db.Query(q, c.Get("userId"))
+	rows, err := r.db.Query(q, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -109,45 +111,14 @@ WHERE user1_id = ?;`
 	return blockUsers, nil
 }
 
-func (r *friendListRepository) getFriendListByUserIdExcludingBlockUsers(c echo.Context, blockUsers []int) (*model.FriendList, error) {
+func (r *friendListRepository) GetFriendListByUserId(userId int) (*model.FriendList, error) {
 	const q = `
-SELECT U.user_id, U.name
-FROM users AS U INNER JOIN friend_link AS FL
-ON U.user_id = FL.user2_id
-WHERE FL.user1_id = ?
-AND U.user_id NOT IN (?);`
+	SELECT U.user_id, U.name
+	FROM users AS U INNER JOIN friend_link AS FL
+	ON U.user_id = FL.user2_id
+	WHERE FL.user1_id = ?`
 
-	dbx := sqlx.NewDb(r.db, "mysql")
-
-	query, args, err := sqlx.In(q, c.Get("userId"), blockUsers)
-	if err != nil {
-		return nil, err
-	}
-
-	var friends []*model.User
-	if err := dbx.Select(&friends, query, args...); err != nil {
-		return nil, err
-	}
-
-	return &model.FriendList{Friends: friends}, nil
-}
-
-func (r *friendListRepository) GetFriendListByUserId(c echo.Context) (*model.FriendList, error) {
-	blockUsers, err := r.getBlockUsersIdList(c)
-	if err != nil {
-		return nil, err
-	}
-	if len(blockUsers) > 0 {
-		return r.getFriendListByUserIdExcludingBlockUsers(c, blockUsers)
-	}
-
-	const q = `
-SELECT U.user_id, U.name
-FROM users AS U INNER JOIN friend_link AS FL
-ON U.user_id = FL.user2_id
-WHERE FL.user1_id = ?`
-
-	rows, err := r.db.Query(q, c.Get("userId"))
+	rows, err := r.db.Query(q, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -169,35 +140,17 @@ WHERE FL.user1_id = ?`
 	return &model.FriendList{Friends: friends}, nil
 }
 
-func (r *friendListRepository) GetFriendListOfFriendsByUserId(c echo.Context) (*model.FriendList, error) {
-	oneHopFriends, err := r.getOneHopFriendsUserIdList(c)
-	if err != nil {
-		return nil, err
-	}
-	if len(oneHopFriends) == 0 {
-		return &model.FriendList{Friends: nil}, nil
-	}
-
-	blockUsers, err := r.getBlockUsersIdList(c)
-	if err != nil {
-		return nil, err
-	}
-
-	excludeUsers := append(oneHopFriends, blockUsers...)
-
+func (r *friendListRepository) GetFriendListByUserIdExcludingBlockUsers(userId int, blockUsers []int) (*model.FriendList, error) {
 	const q = `
-	SELECT DISTINCT U.user_id, U.name
-	FROM users AS U
-	INNER JOIN friend_link AS FL
+	SELECT U.user_id, U.name
+	FROM users AS U INNER JOIN friend_link AS FL
 	ON U.user_id = FL.user2_id
-	INNER JOIN friend_link AS FL2
-	ON FL.user1_id = FL2.user2_id
-	WHERE FL2.user1_id = ?
+	WHERE FL.user1_id = ?
 	AND U.user_id NOT IN (?);`
 
 	dbx := sqlx.NewDb(r.db, "mysql")
 
-	query, args, err := sqlx.In(q, c.Get("userId"), excludeUsers)
+	query, args, err := sqlx.In(q, userId, blockUsers)
 	if err != nil {
 		return nil, err
 	}
@@ -210,22 +163,33 @@ func (r *friendListRepository) GetFriendListOfFriendsByUserId(c echo.Context) (*
 	return &model.FriendList{Friends: friends}, nil
 }
 
-func (r *friendListRepository) GetFriendListOfFriendsByUserIdWithPaging(c echo.Context) (*model.FriendList, error) {
-	oneHopFriends, err := r.getOneHopFriendsUserIdList(c)
+func (r *friendListRepository) GetFriendListOfFriendsByUserId(userId int, excludeUsers []int) (*model.FriendList, error) {
+	const q = `
+	SELECT DISTINCT U.user_id, U.name
+	FROM users AS U
+	INNER JOIN friend_link AS FL
+	ON U.user_id = FL.user2_id
+	INNER JOIN friend_link AS FL2
+	ON FL.user1_id = FL2.user2_id
+	WHERE FL2.user1_id = ?
+	AND U.user_id NOT IN (?);`
+
+	dbx := sqlx.NewDb(r.db, "mysql")
+
+	query, args, err := sqlx.In(q, userId, excludeUsers)
 	if err != nil {
 		return nil, err
 	}
-	if len(oneHopFriends) == 0 {
-		return &model.FriendList{Friends: nil}, nil
-	}
 
-	blockUsers, err := r.getBlockUsersIdList(c)
-	if err != nil {
+	var friends []*model.User
+	if err := dbx.Select(&friends, query, args...); err != nil {
 		return nil, err
 	}
 
-	excludeUsers := append(oneHopFriends, blockUsers...)
+	return &model.FriendList{Friends: friends}, nil
+}
 
+func (r *friendListRepository) GetFriendListOfFriendsByUserIdWithPaging(userId int, excludeUsers []int, limit, offset int) (*model.FriendList, error) {
 	const q = `
 	SELECT DISTINCT U.user_id, U.name
 	FROM users AS U
@@ -239,7 +203,7 @@ func (r *friendListRepository) GetFriendListOfFriendsByUserIdWithPaging(c echo.C
 
 	dbx := sqlx.NewDb(r.db, "mysql")
 
-	query, args, err := sqlx.In(q, c.Get("userId"), excludeUsers, c.Get("limit"), c.Get("offset"))
+	query, args, err := sqlx.In(q, userId, excludeUsers, limit, offset)
 	if err != nil {
 		return nil, err
 	}
