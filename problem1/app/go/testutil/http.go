@@ -5,6 +5,7 @@ import (
 	"io"
 	"testing"
 
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,4 +23,11 @@ func AssertResponseBody(t *testing.T, want any, body io.Reader) {
 	}
 
 	assert.JSONEq(t, string(b), string(got))
+}
+
+func SetUpContextWithDefault() echo.Context {
+	c := echo.New().NewContext(nil, nil)
+	c.Set("userId", 123456789)
+
+	return c
 }

@@ -17,7 +17,6 @@ import (
 type friendListControllerTest struct {
 	flu  *mock_usecase.MockFriendListUseCase
 	flc  FriendListController
-	c    echo.Context
 	echo *echo.Echo
 }
 
