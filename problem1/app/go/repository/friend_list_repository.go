@@ -29,14 +29,12 @@ func NewFriendListRepository(db *sql.DB) FriendListRepository {
 }
 
 func (r *friendListRepository) CheckUserExist(c echo.Context) (bool, error) {
-	userId := c.QueryParam("ID")
-
 	const q = `
 SELECT user_id, name
 FROM users
 WHERE user_id = ?`
 
-	row := r.db.QueryRow(q, userId)
+	row := r.db.QueryRow(q, c.Get("userId"))
 
 	user := &model.User{}
 	if err := row.Scan(&user.Id, &user.Name); err != nil {
@@ -51,14 +49,12 @@ WHERE user_id = ?`
 }
 
 func (r *friendListRepository) getOneHopFriendsUserIdList(c echo.Context) ([]int, error) {
-	userId := c.QueryParam("ID")
-
 	const q = `
 SELECT user2_id
 FROM friend_link
 WHERE user1_id = ?;`
 
-	rows, err := r.db.Query(q, userId)
+	rows, err := r.db.Query(q, c.Get("userId"))
 	if err != nil {
 		return nil, err
 	}
@@ -83,14 +79,12 @@ WHERE user1_id = ?;`
 }
 
 func (r *friendListRepository) getBlockUsersIdList(c echo.Context) ([]int, error) {
-	userId := c.QueryParam("ID")
-
 	const q = `
 SELECT user2_id
 FROM block_list
 WHERE user1_id = ?;`
 
-	rows, err := r.db.Query(q, userId)
+	rows, err := r.db.Query(q, c.Get("userId"))
 	if err != nil {
 		return nil, err
 	}
@@ -115,8 +109,6 @@ WHERE user1_id = ?;`
 }
 
 func (r *friendListRepository) getFriendListByUserIdExcludingBlockUsers(c echo.Context, blockUsers []int) (*model.FriendList, error) {
-	userId := c.QueryParam("ID")
-
 	const q = `
 SELECT U.user_id, U.name
 FROM users AS U INNER JOIN friend_link AS FL
@@ -126,7 +118,7 @@ AND U.user_id NOT IN (?);`
 
 	dbx := sqlx.NewDb(r.db, "mysql")
 
-	query, args, err := sqlx.In(q, userId, blockUsers)
+	query, args, err := sqlx.In(q, c.Get("userId"), blockUsers)
 	if err != nil {
 		return nil, err
 	}
@@ -148,15 +140,13 @@ func (r *friendListRepository) GetFriendListByUserId(c echo.Context) (*model.Fri
 		return r.getFriendListByUserIdExcludingBlockUsers(c, blockUsers)
 	}
 
-	userId := c.QueryParam("ID")
-
 	const q = `
 SELECT U.user_id, U.name
 FROM users AS U INNER JOIN friend_link AS FL
 ON U.user_id = FL.user2_id
 WHERE FL.user1_id = ?`
 
-	rows, err := r.db.Query(q, userId)
+	rows, err := r.db.Query(q, c.Get("userId"))
 	if err != nil {
 		return nil, err
 	}
@@ -179,8 +169,6 @@ WHERE FL.user1_id = ?`
 }
 
 func (r *friendListRepository) getFriendListOfFriendsByUserIdExcludingOneHopFriendsAndBlockUsers(c echo.Context, excludeUsers []int) (*model.FriendList, error) {
-	userId := c.QueryParam("ID")
-
 	const q = `
 	SELECT U.user_id, U.name
 		FROM users AS U
@@ -193,7 +181,7 @@ func (r *friendListRepository) getFriendListOfFriendsByUserIdExcludingOneHopFrie
 
 	dbx := sqlx.NewDb(r.db, "mysql")
 
-	query, args, err := sqlx.In(q, userId, excludeUsers)
+	query, args, err := sqlx.In(q, c.Get("userId"), excludeUsers)
 	if err != nil {
 		return nil, err
 	}
@@ -222,8 +210,6 @@ func (r *friendListRepository) GetFriendListOfFriendsByUserId(c echo.Context) (*
 		return r.getFriendListOfFriendsByUserIdExcludingOneHopFriendsAndBlockUsers(c, excludeUsers)
 	}
 
-	userId := c.QueryParam("ID")
-
 	const q = `
 	SELECT DISTINCT U.user_id, U.name
 	FROM users AS U
@@ -233,7 +219,7 @@ func (r *friendListRepository) GetFriendListOfFriendsByUserId(c echo.Context) (*
 	ON FL.user1_id = FL2.user2_id
 	WHERE FL2.user1_id = ?;`
 
-	rows, err := r.db.Query(q, userId)
+	rows, err := r.db.Query(q, c.Get("userId"))
 	if err != nil {
 		return nil, err
 	}

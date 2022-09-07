@@ -41,6 +41,7 @@ func (c *friendListController) GetFriendListByUserId(ctx echo.Context) error {
 		httputil.RespondError(ctx, httputil.NewHTTPError(err, http.StatusBadRequest, "userId is invalid"))
 		return err
 	}
+	ctx.Set("userId", userId)
 
 	friendList, err := c.friendListUseCase.GetFriendListByUserId(ctx)
 	if err != nil {
@@ -62,6 +63,7 @@ func (c *friendListController) GetFriendListOfFriendsByUserId(ctx echo.Context) 
 		httputil.RespondError(ctx, httputil.NewHTTPError(err, http.StatusBadRequest, "userId is invalid"))
 		return err
 	}
+	ctx.Set("userId", userId)
 
 	friendList, err := c.friendListUseCase.GetFriendListOfFriendsByUserId(ctx)
 	if err != nil {
