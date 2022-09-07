@@ -578,3 +578,91 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
 		})
 	}
 }
+
+func Test_friendListRepository_GetFriendListOfFriendsByUserIdWithPaging(t *testing.T) {
+	testUsers := newTestUsers()
+	testUserLink := []userLink{
+		{
+			user1Id: 123456789,
+			user2Id: 444444,
+		},
+		{
+			user1Id: 444444,
+			user2Id: 111111,
+		},
+		{
+			user1Id: 444444,
+			user2Id: 222222,
+		},
+		{
+			user1Id: 444444,
+			user2Id: 333333,
+		},
+	}
+
+	tests := []struct {
+		name    string
+		prepare func(*friendListRepositoryTest)
+		want    *model.FriendList
+		wantErr bool
+	}{
+		{
+			name: "ok: limit",
+			prepare: func(rt *friendListRepositoryTest) {
+				for _, tu := range testUsers {
+					rt.insertTestUserList(t, rt.db, tu)
+				}
+				rt.insertTestUserList(t, rt.db, testUser{
+					userId: 444444,
+					name:   "piyo",
+				})
+				for _, ul := range testUserLink {
+					rt.insertTestFriendLink(t, rt.db, ul)
+				}
+				rt.c.Set("limit", 2)
+				rt.c.Set("offset", 0)
+			},
+			want:    newFriendList(),
+			wantErr: false,
+		},
+		{
+			name: "ok: offset",
+			prepare: func(rt *friendListRepositoryTest) {
+				for _, tu := range testUsers {
+					rt.insertTestUserList(t, rt.db, tu)
+				}
+				rt.insertTestUserList(t, rt.db, testUser{
+					userId: 444444,
+					name:   "piyo",
+				})
+				for _, ul := range testUserLink {
+					rt.insertTestFriendLink(t, rt.db, ul)
+				}
+				rt.c.Set("limit", 3)
+				rt.c.Set("offset", 2)
+			},
+			want: &model.FriendList{
+				Friends: []*model.User{
+					{
+						Id:   333333,
+						Name: "bar",
+					},
+				},
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rt := newFriendListRepositoryTest(t)
+			tt.prepare(rt)
+
+			got, err := rt.flr.GetFriendListOfFriendsByUserIdWithPaging(rt.c)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("GetFriendListOfFriendsByUserIdWithPaging() error = %v, wantErr = %v", err, tt.wantErr)
+			}
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
