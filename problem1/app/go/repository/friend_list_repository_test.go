@@ -29,14 +29,14 @@ func newFriendListRepositoryTest(t *testing.T) *friendListRepositoryTest {
 
 func newFriendList() *model.FriendList {
 	return &model.FriendList{
-		Friends: []*model.User{
+		Friends: []*model.Friend{
 			{
-				Id:   111111,
-				Name: "hoge",
+				UserId: 111111,
+				Name:   "hoge",
 			},
 			{
-				Id:   222222,
-				Name: "fuga",
+				UserId: 222222,
+				Name:   "fuga",
 			},
 		},
 	}
@@ -333,7 +333,7 @@ func Test_friendListRepository_GetFriendListByUserId(t *testing.T) {
 				}
 			},
 			want: &model.FriendList{
-				Friends: []*model.User(nil),
+				Friends: []*model.Friend(nil),
 			},
 			wantErr: false,
 		},
@@ -391,7 +391,7 @@ func Test_friendListRepository_GetFriendListByUserIdExcludingBlockUsers(t *testi
 			},
 			blockUsers: []int{111111, 222222, 333333},
 			want: &model.FriendList{
-				Friends: []*model.User(nil),
+				Friends: []*model.Friend(nil),
 			},
 			wantErr: false,
 		},
@@ -482,7 +482,7 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
 			},
 			excludeUsers: []int{111111, 222222, 333333},
 			want: &model.FriendList{
-				Friends: []*model.User(nil),
+				Friends: []*model.Friend(nil),
 			},
 			wantErr: false,
 		},
@@ -498,7 +498,7 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
 			},
 			excludeUsers: []int{444444},
 			want: &model.FriendList{
-				Friends: []*model.User(nil),
+				Friends: []*model.Friend(nil),
 			},
 			wantErr: false,
 		},
@@ -511,7 +511,7 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
 			},
 			excludeUsers: []int{111111},
 			want: &model.FriendList{
-				Friends: []*model.User(nil),
+				Friends: []*model.Friend(nil),
 			},
 			wantErr: false,
 		},
@@ -607,10 +607,10 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserIdWithPaging(t *testi
 			limit:        3,
 			offset:       2,
 			want: &model.FriendList{
-				Friends: []*model.User{
+				Friends: []*model.Friend{
 					{
-						Id:   333333,
-						Name: "bar",
+						UserId: 333333,
+						Name:   "bar",
 					},
 				},
 			},

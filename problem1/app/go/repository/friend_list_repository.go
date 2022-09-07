@@ -39,8 +39,8 @@ func (r *friendListRepository) CheckUserExist(userId int) (bool, error) {
 
 	row := r.db.QueryRow(q, userId)
 
-	user := &model.User{}
-	if err := row.Scan(&user.Id, &user.Name); err != nil {
+	user := &model.Friend{}
+	if err := row.Scan(&user.UserId, &user.Name); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return false, nil
 		}
@@ -124,10 +124,10 @@ func (r *friendListRepository) GetFriendListByUserId(userId int) (*model.FriendL
 	}
 	defer rows.Close()
 
-	var friends []*model.User
+	var friends []*model.Friend
 	for rows.Next() {
-		friend := &model.User{}
-		if err := rows.Scan(&friend.Id, &friend.Name); err != nil {
+		friend := &model.Friend{}
+		if err := rows.Scan(&friend.UserId, &friend.Name); err != nil {
 			return nil, err
 		}
 
@@ -155,7 +155,7 @@ func (r *friendListRepository) GetFriendListByUserIdExcludingBlockUsers(userId i
 		return nil, err
 	}
 
-	var friends []*model.User
+	var friends []*model.Friend
 	if err := dbx.Select(&friends, query, args...); err != nil {
 		return nil, err
 	}
@@ -181,7 +181,7 @@ func (r *friendListRepository) GetFriendListOfFriendsByUserId(userId int, exclud
 		return nil, err
 	}
 
-	var friends []*model.User
+	var friends []*model.Friend
 	if err := dbx.Select(&friends, query, args...); err != nil {
 		return nil, err
 	}
@@ -208,7 +208,7 @@ func (r *friendListRepository) GetFriendListOfFriendsByUserIdWithPaging(userId i
 		return nil, err
 	}
 
-	var friends []*model.User
+	var friends []*model.Friend
 	if err := dbx.Select(&friends, query, args...); err != nil {
 		return nil, err
 	}

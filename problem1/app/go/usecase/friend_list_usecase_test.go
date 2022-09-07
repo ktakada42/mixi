@@ -45,14 +45,14 @@ func newFriendListUseCaseTest(t *testing.T) *friendListUseCaseTest {
 
 func newFriendList() *model.FriendList {
 	return &model.FriendList{
-		Friends: []*model.User{
+		Friends: []*model.Friend{
 			{
-				Id:   111111,
-				Name: "hoge",
+				UserId: 111111,
+				Name:   "hoge",
 			},
 			{
-				Id:   222222,
-				Name: "fuga",
+				UserId: 222222,
+				Name:   "fuga",
 			},
 		},
 	}

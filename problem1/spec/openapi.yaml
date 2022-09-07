@@ -21,7 +21,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/FriendList"
         "400":
           description: "User not exist"
           content:
@@ -114,7 +114,7 @@ components:
         message:
           type: string
           example: "error message"
-    id:
+    userId:
       type: integer
       maxLength: 11
       example: 12345678910
@@ -122,15 +122,15 @@ components:
       type: string
       maxLength: 64
       example: "鈴木 一郎"
-    User:
+    Friend:
       type: object
       properties:
-        ID:
-          $ref: "#/components/schemas/id"
+        userId:
+          $ref: "#/components/schemas/userId"
         name:
           $ref: "#/components/schemas/name"
       required:
-        - ID
+        - userId
         - name
     FriendList:
       type: object
@@ -138,4 +138,4 @@ components:
         friends:
           type: array
           items:
-            $ref: "#/components/schemas/User"
+            $ref: "#/components/schemas/Friend"

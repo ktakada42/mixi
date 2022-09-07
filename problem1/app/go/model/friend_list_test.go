@@ -12,19 +12,19 @@ func Test_FriendList_SchemaValidation(t *testing.T) {
 		target     any
 	}{
 		{
-			schemaName: "User",
-			target: &User{
-				Id:   testutil.UserIDForDebug,
-				Name: testutil.UserNameForDebug,
+			schemaName: "Friend",
+			target: &Friend{
+				UserId: testutil.UserIDForDebug,
+				Name:   testutil.UserNameForDebug,
 			},
 		},
 		{
 			schemaName: "FriendList",
 			target: &FriendList{
-				Friends: []*User{
+				Friends: []*Friend{
 					{
-						Id:   testutil.UserIDForDebug,
-						Name: testutil.UserNameForDebug,
+						UserId: testutil.UserIDForDebug,
+						Name:   testutil.UserNameForDebug,
 					},
 				},
 			},
