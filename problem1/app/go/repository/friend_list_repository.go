@@ -16,6 +16,7 @@ type FriendListRepository interface {
 	CheckUserExist(c echo.Context) (bool, error)
 	GetFriendListByUserId(c echo.Context) (*model.FriendList, error)
 	GetFriendListOfFriendsByUserId(c echo.Context) (*model.FriendList, error)
+	GetFriendListOfFriendsByUserIdWithPaging(c echo.Context) (*model.FriendList, error)
 }
 
 type friendListRepository struct {
@@ -197,6 +198,48 @@ func (r *friendListRepository) GetFriendListOfFriendsByUserId(c echo.Context) (*
 	dbx := sqlx.NewDb(r.db, "mysql")
 
 	query, args, err := sqlx.In(q, c.Get("userId"), excludeUsers)
+	if err != nil {
+		return nil, err
+	}
+
+	var friends []*model.User
+	if err := dbx.Select(&friends, query, args...); err != nil {
+		return nil, err
+	}
+
+	return &model.FriendList{Friends: friends}, nil
+}
+
+func (r *friendListRepository) GetFriendListOfFriendsByUserIdWithPaging(c echo.Context) (*model.FriendList, error) {
+	oneHopFriends, err := r.getOneHopFriendsUserIdList(c)
+	if err != nil {
+		return nil, err
+	}
+	if len(oneHopFriends) == 0 {
+		return &model.FriendList{Friends: nil}, nil
+	}
+
+	blockUsers, err := r.getBlockUsersIdList(c)
+	if err != nil {
+		return nil, err
+	}
+
+	excludeUsers := append(oneHopFriends, blockUsers...)
+
+	const q = `
+	SELECT DISTINCT U.user_id, U.name
+	FROM users AS U
+	INNER JOIN friend_link AS FL
+	ON U.user_id = FL.user2_id
+	INNER JOIN friend_link AS FL2
+	ON FL.user1_id = FL2.user2_id
+	WHERE FL2.user1_id = ?
+	AND U.user_id NOT IN (?)
+	LIMIT ? OFFSET ?;`
+
+	dbx := sqlx.NewDb(r.db, "mysql")
+
+	query, args, err := sqlx.In(q, c.Get("userId"), excludeUsers, c.Get("limit"), c.Get("offset"))
 	if err != nil {
 		return nil, err
 	}
