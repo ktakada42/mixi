@@ -137,10 +137,10 @@ func (r *friendListRepositoryTest) insertTestBlockList(t *testing.T, db *sql.DB,
 }
 
 func Test_friendListRepository_CheckUserExist(t *testing.T) {
+	userId := testutil.UserIDForDebug
 	tests := []struct {
 		name    string
 		prepare func(*friendListRepositoryTest)
-		userId  int
 		want    bool
 		wantErr bool
 	}{
@@ -153,14 +153,12 @@ func Test_friendListRepository_CheckUserExist(t *testing.T) {
 				}
 				rt.insertTestUserList(t, rt.db, tu)
 			},
-			userId:  testutil.UserIDForDebug,
 			want:    true,
 			wantErr: false,
 		},
 		{
 			name:    "ok: user not exist",
 			prepare: func(rt *friendListRepositoryTest) {},
-			userId:  testutil.UserIDForDebug,
 			want:    false,
 			wantErr: false,
 		},
@@ -171,7 +169,7 @@ func Test_friendListRepository_CheckUserExist(t *testing.T) {
 			rt := newFriendListRepositoryTest(t)
 			tt.prepare(rt)
 
-			got, err := rt.flr.CheckUserExist(tt.userId)
+			got, err := rt.flr.CheckUserExist(userId)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("CheckUserExist() error = %v, wantErr = %v", err, tt.wantErr)
 			}
@@ -181,13 +179,13 @@ func Test_friendListRepository_CheckUserExist(t *testing.T) {
 }
 
 func Test_friendListRepository_GetOneHopFriendsUserIdList(t *testing.T) {
+	userId := testutil.UserIDForDebug
 	testUsers := newTestUsers()
 	testUserLink := newTestUserLink()
 
 	tests := []struct {
 		name    string
 		prepare func(*friendListRepositoryTest)
-		userId  int
 		want    []int
 		wantErr bool
 	}{
@@ -201,7 +199,6 @@ func Test_friendListRepository_GetOneHopFriendsUserIdList(t *testing.T) {
 					rt.insertTestFriendLink(t, rt.db, ul)
 				}
 			},
-			userId:  testutil.UserIDForDebug,
 			want:    []int{111111, 222222, 333333},
 			wantErr: false,
 		},
@@ -212,7 +209,6 @@ func Test_friendListRepository_GetOneHopFriendsUserIdList(t *testing.T) {
 					rt.insertTestUserList(t, rt.db, tu)
 				}
 			},
-			userId:  testutil.UserIDForDebug,
 			want:    nil,
 			wantErr: false,
 		},
@@ -223,7 +219,7 @@ func Test_friendListRepository_GetOneHopFriendsUserIdList(t *testing.T) {
 			rt := newFriendListRepositoryTest(t)
 			tt.prepare(rt)
 
-			got, err := rt.flr.GetOneHopFriendsUserIdList(tt.userId)
+			got, err := rt.flr.GetOneHopFriendsUserIdList(userId)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("GetOneHopFrinedsUserIdList() error = %v, wantErr = %v", err, tt.wantErr)
 			}
@@ -233,13 +229,13 @@ func Test_friendListRepository_GetOneHopFriendsUserIdList(t *testing.T) {
 }
 
 func Test_friendListRepository_GetBlockUsersIdList(t *testing.T) {
+	userId := testutil.UserIDForDebug
 	testUsers := newTestUsers()
 	testUserLink := newTestUserLink()
 
 	tests := []struct {
 		name    string
 		prepare func(*friendListRepositoryTest)
-		userId  int
 		want    []int
 		wantErr bool
 	}{
@@ -257,7 +253,6 @@ func Test_friendListRepository_GetBlockUsersIdList(t *testing.T) {
 					user2Id: 111111,
 				})
 			},
-			userId:  testutil.UserIDForDebug,
 			want:    []int{111111},
 			wantErr: false,
 		},
@@ -274,7 +269,6 @@ func Test_friendListRepository_GetBlockUsersIdList(t *testing.T) {
 					rt.insertTestBlockList(t, rt.db, ul)
 				}
 			},
-			userId:  testutil.UserIDForDebug,
 			want:    []int{111111, 222222, 333333},
 			wantErr: false,
 		},
@@ -288,7 +282,6 @@ func Test_friendListRepository_GetBlockUsersIdList(t *testing.T) {
 					rt.insertTestFriendLink(t, rt.db, ul)
 				}
 			},
-			userId:  testutil.UserIDForDebug,
 			want:    nil,
 			wantErr: false,
 		},
@@ -299,7 +292,7 @@ func Test_friendListRepository_GetBlockUsersIdList(t *testing.T) {
 			rt := newFriendListRepositoryTest(t)
 			tt.prepare(rt)
 
-			got, err := rt.flr.GetBlockUsersIdList(tt.userId)
+			got, err := rt.flr.GetBlockUsersIdList(userId)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("GetBlockUsersIdList() error = %v, wantErr = %v", err, tt.wantErr)
 			}
@@ -309,13 +302,13 @@ func Test_friendListRepository_GetBlockUsersIdList(t *testing.T) {
 }
 
 func Test_friendListRepository_GetFriendListByUserId(t *testing.T) {
+	userId := testutil.UserIDForDebug
 	testUsers := newTestUsers()
 	testUserLink := newTestUserLink()
 
 	tests := []struct {
 		name    string
 		prepare func(*friendListRepositoryTest)
-		userId  int
 		want    *model.FriendList
 		wantErr bool
 	}{
@@ -329,7 +322,6 @@ func Test_friendListRepository_GetFriendListByUserId(t *testing.T) {
 					rt.insertTestFriendLink(t, rt.db, testUserLink[i])
 				}
 			},
-			userId:  testutil.UserIDForDebug,
 			want:    newFriendList(),
 			wantErr: false,
 		},
@@ -340,7 +332,6 @@ func Test_friendListRepository_GetFriendListByUserId(t *testing.T) {
 					rt.insertTestUserList(t, rt.db, tu)
 				}
 			},
-			userId: testutil.UserIDForDebug,
 			want: &model.FriendList{
 				Friends: []*model.User(nil),
 			},
@@ -353,7 +344,7 @@ func Test_friendListRepository_GetFriendListByUserId(t *testing.T) {
 			rt := newFriendListRepositoryTest(t)
 			tt.prepare(rt)
 
-			got, err := rt.flr.GetFriendListByUserId(tt.userId)
+			got, err := rt.flr.GetFriendListByUserId(userId)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("GetFriendListByUserId() error = %v, wantErr = %v", err, tt.wantErr)
 			}
@@ -363,13 +354,13 @@ func Test_friendListRepository_GetFriendListByUserId(t *testing.T) {
 }
 
 func Test_friendListRepository_GetFriendListByUserIdExcludingBlockUsers(t *testing.T) {
+	userId := testutil.UserIDForDebug
 	testUsers := newTestUsers()
 	testUserLink := newTestUserLink()
 
 	tests := []struct {
 		name       string
 		prepare    func(*friendListRepositoryTest)
-		userId     int
 		blockUsers []int
 		want       *model.FriendList
 		wantErr    bool
@@ -384,7 +375,6 @@ func Test_friendListRepository_GetFriendListByUserIdExcludingBlockUsers(t *testi
 					rt.insertTestFriendLink(t, rt.db, ul)
 				}
 			},
-			userId:     testutil.UserIDForDebug,
 			blockUsers: []int{333333},
 			want:       newFriendList(),
 			wantErr:    false,
@@ -399,7 +389,6 @@ func Test_friendListRepository_GetFriendListByUserIdExcludingBlockUsers(t *testi
 					rt.insertTestFriendLink(t, rt.db, ul)
 				}
 			},
-			userId:     testutil.UserIDForDebug,
 			blockUsers: []int{111111, 222222, 333333},
 			want: &model.FriendList{
 				Friends: []*model.User(nil),
@@ -409,7 +398,6 @@ func Test_friendListRepository_GetFriendListByUserIdExcludingBlockUsers(t *testi
 		{
 			name:       "ng: blockUsers nil",
 			prepare:    func(rt *friendListRepositoryTest) {},
-			userId:     testutil.UserIDForDebug,
 			blockUsers: nil,
 			want:       nil,
 			wantErr:    true,
@@ -421,7 +409,7 @@ func Test_friendListRepository_GetFriendListByUserIdExcludingBlockUsers(t *testi
 			rt := newFriendListRepositoryTest(t)
 			tt.prepare(rt)
 
-			got, err := rt.flr.GetFriendListByUserIdExcludingBlockUsers(tt.userId, tt.blockUsers)
+			got, err := rt.flr.GetFriendListByUserIdExcludingBlockUsers(userId, tt.blockUsers)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("GetFriendListByUserIdExcludingBlockUsers() error = %v, wantErr = %v", err, tt.wantErr)
 			}
@@ -431,6 +419,7 @@ func Test_friendListRepository_GetFriendListByUserIdExcludingBlockUsers(t *testi
 }
 
 func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
+	userId := testutil.UserIDForDebug
 	testUsers := newTestUsers()
 	testUserLink := []userLink{
 		{
@@ -455,7 +444,6 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
 	tests := []struct {
 		name         string
 		prepare      func(*friendListRepositoryTest)
-		userId       int
 		excludeUsers []int
 		want         *model.FriendList
 		wantErr      bool
@@ -474,7 +462,6 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
 					rt.insertTestFriendLink(t, rt.db, ul)
 				}
 			},
-			userId:       testutil.UserIDForDebug,
 			excludeUsers: []int{333333},
 			want:         newFriendList(),
 			wantErr:      false,
@@ -493,7 +480,6 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
 					rt.insertTestFriendLink(t, rt.db, ul)
 				}
 			},
-			userId:       testutil.UserIDForDebug,
 			excludeUsers: []int{111111, 222222, 333333},
 			want: &model.FriendList{
 				Friends: []*model.User(nil),
@@ -510,7 +496,6 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
 					rt.insertTestFriendLink(t, rt.db, ul)
 				}
 			},
-			userId:       testutil.UserIDForDebug,
 			excludeUsers: []int{444444},
 			want: &model.FriendList{
 				Friends: []*model.User(nil),
@@ -524,7 +509,6 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
 					rt.insertTestUserList(t, rt.db, tu)
 				}
 			},
-			userId:       testutil.UserIDForDebug,
 			excludeUsers: []int{111111},
 			want: &model.FriendList{
 				Friends: []*model.User(nil),
@@ -534,7 +518,6 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
 		{
 			name:         "ng: excludeUsers nil",
 			prepare:      func(rt *friendListRepositoryTest) {},
-			userId:       testutil.UserIDForDebug,
 			excludeUsers: nil,
 			want:         nil,
 			wantErr:      true,
@@ -546,7 +529,7 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
 			rt := newFriendListRepositoryTest(t)
 			tt.prepare(rt)
 
-			got, err := rt.flr.GetFriendListOfFriendsByUserId(tt.userId, tt.excludeUsers)
+			got, err := rt.flr.GetFriendListOfFriendsByUserId(userId, tt.excludeUsers)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("GetFriendListOfFriendsByUserId() error = %v, wantErr = %v", err, tt.wantErr)
 			}
@@ -556,6 +539,7 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
 }
 
 func Test_friendListRepository_GetFriendListOfFriendsByUserIdWithPaging(t *testing.T) {
+	userId := testutil.UserIDForDebug
 	testUsers := newTestUsers()
 	testUserLink := []userLink{
 		{
@@ -579,7 +563,6 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserIdWithPaging(t *testi
 	tests := []struct {
 		name         string
 		prepare      func(*friendListRepositoryTest)
-		userId       int
 		excludeUsers []int
 		limit        int
 		offset       int
@@ -600,7 +583,6 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserIdWithPaging(t *testi
 					rt.insertTestFriendLink(t, rt.db, ul)
 				}
 			},
-			userId:       testutil.UserIDForDebug,
 			excludeUsers: []int{444444},
 			limit:        2,
 			offset:       0,
@@ -621,7 +603,6 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserIdWithPaging(t *testi
 					rt.insertTestFriendLink(t, rt.db, ul)
 				}
 			},
-			userId:       testutil.UserIDForDebug,
 			excludeUsers: []int{444444},
 			limit:        3,
 			offset:       2,
@@ -638,7 +619,6 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserIdWithPaging(t *testi
 		{
 			name:         "ng: excludeUsers nil",
 			prepare:      func(rt *friendListRepositoryTest) {},
-			userId:       testutil.UserIDForDebug,
 			excludeUsers: nil,
 			want:         nil,
 			wantErr:      true,
@@ -650,7 +630,7 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserIdWithPaging(t *testi
 			rt := newFriendListRepositoryTest(t)
 			tt.prepare(rt)
 
-			got, err := rt.flr.GetFriendListOfFriendsByUserIdWithPaging(tt.userId, tt.excludeUsers, tt.limit, tt.offset)
+			got, err := rt.flr.GetFriendListOfFriendsByUserIdWithPaging(userId, tt.excludeUsers, tt.limit, tt.offset)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("GetFriendListOfFriendsByUserIdWithPaging() error = %v, wantErr = %v", err, tt.wantErr)
 			}
