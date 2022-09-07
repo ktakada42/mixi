@@ -32,8 +32,7 @@ const (
 )
 
 func (c *friendListController) GetFriendListByUserId(ctx echo.Context) error {
-	q := ctx.QueryParam("userId")
-	userId, err := strconv.Atoi(q)
+	userId, err := strconv.Atoi(ctx.QueryParam("ID"))
 	if err != nil {
 		httputil.RespondError(ctx, httputil.NewHTTPError(err, http.StatusBadRequest, "userId is not integer or not exist in query parameter"))
 		return err
@@ -54,8 +53,7 @@ func (c *friendListController) GetFriendListByUserId(ctx echo.Context) error {
 }
 
 func (c *friendListController) GetFriendListOfFriendsByUserId(ctx echo.Context) error {
-	q := ctx.QueryParam("userId")
-	userId, err := strconv.Atoi(q)
+	userId, err := strconv.Atoi(ctx.QueryParam("ID"))
 	if err != nil {
 		httputil.RespondError(ctx, httputil.NewHTTPError(err, http.StatusBadRequest, "userId is not integer or not exist in query parameter"))
 		return err

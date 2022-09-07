@@ -29,7 +29,7 @@ func NewFriendListRepository(db *sql.DB) FriendListRepository {
 }
 
 func (r *friendListRepository) CheckUserExist(c echo.Context) (bool, error) {
-	userId := c.QueryParam("userId")
+	userId := c.QueryParam("ID")
 
 	const q = `
 SELECT user_id, name
@@ -51,7 +51,7 @@ WHERE user_id = ?`
 }
 
 func (r *friendListRepository) getOneHopFriendsUserIdList(c echo.Context) ([]int, error) {
-	userId := c.QueryParam("userId")
+	userId := c.QueryParam("ID")
 
 	const q = `
 SELECT user2_id
@@ -83,7 +83,7 @@ WHERE user1_id = ?;`
 }
 
 func (r *friendListRepository) getBlockUsersIdList(c echo.Context) ([]int, error) {
-	userId := c.QueryParam("userId")
+	userId := c.QueryParam("ID")
 
 	const q = `
 SELECT user2_id
@@ -115,7 +115,7 @@ WHERE user1_id = ?;`
 }
 
 func (r *friendListRepository) getFriendListByUserIdExcludingBlockUsers(c echo.Context, blockUsers []int) (*model.FriendList, error) {
-	userId := c.QueryParam("userId")
+	userId := c.QueryParam("ID")
 
 	const q = `
 SELECT U.user_id, U.name
@@ -148,7 +148,7 @@ func (r *friendListRepository) GetFriendListByUserId(c echo.Context) (*model.Fri
 		return r.getFriendListByUserIdExcludingBlockUsers(c, blockUsers)
 	}
 
-	userId := c.QueryParam("userId")
+	userId := c.QueryParam("ID")
 
 	const q = `
 SELECT U.user_id, U.name
@@ -179,7 +179,7 @@ WHERE FL.user1_id = ?`
 }
 
 func (r *friendListRepository) getFriendListOfFriendsByUserIdExcludingOneHopFriendsAndBlockUsers(c echo.Context, excludeUsers []int) (*model.FriendList, error) {
-	userId := c.QueryParam("userId")
+	userId := c.QueryParam("ID")
 
 	const q = `
 	SELECT U.user_id, U.name
@@ -222,7 +222,7 @@ func (r *friendListRepository) GetFriendListOfFriendsByUserId(c echo.Context) (*
 		return r.getFriendListOfFriendsByUserIdExcludingOneHopFriendsAndBlockUsers(c, excludeUsers)
 	}
 
-	userId := c.QueryParam("userId")
+	userId := c.QueryParam("ID")
 
 	const q = `
 	SELECT DISTINCT U.user_id, U.name

@@ -65,7 +65,7 @@ func Test_friendListController_GetFriendListByUserId(t *testing.T) {
 			expects: func(ct *friendListControllerTest) {
 				ct.flu.EXPECT().GetFriendListByUserId(gomock.Any()).Return(want, nil)
 			},
-			url:        "/get_friend_list?userId=123456789",
+			url:        "/get_friend_list?ID=123456789",
 			want:       want,
 			wantStatus: http.StatusOK,
 			wantErr:    false,
@@ -81,7 +81,7 @@ func Test_friendListController_GetFriendListByUserId(t *testing.T) {
 		{
 			name:       "ng: userId not integer",
 			expects:    func(ct *friendListControllerTest) {},
-			url:        "/get_friend_list?userId=invalid",
+			url:        "/get_friend_list?ID=invalid",
 			want:       nil,
 			wantStatus: http.StatusBadRequest,
 			wantErr:    true,
@@ -89,7 +89,7 @@ func Test_friendListController_GetFriendListByUserId(t *testing.T) {
 		{
 			name:       "ng: userId minus",
 			expects:    func(ct *friendListControllerTest) {},
-			url:        "/get_friend_list?userId=-1",
+			url:        "/get_friend_list?ID=-1",
 			want:       nil,
 			wantStatus: http.StatusBadRequest,
 			wantErr:    true,
@@ -97,7 +97,7 @@ func Test_friendListController_GetFriendListByUserId(t *testing.T) {
 		{
 			name:       "ng: userId over mysql max limit",
 			expects:    func(ct *friendListControllerTest) {},
-			url:        "/get_friend_list?userId=999999999999999999",
+			url:        "/get_friend_list?ID=999999999999999999",
 			want:       nil,
 			wantStatus: http.StatusBadRequest,
 			wantErr:    true,
@@ -107,7 +107,7 @@ func Test_friendListController_GetFriendListByUserId(t *testing.T) {
 			expects: func(ct *friendListControllerTest) {
 				ct.flu.EXPECT().GetFriendListByUserId(gomock.Any()).Return(nil, testutil.ErrTest)
 			},
-			url:        "/get_friend_list?userId=0",
+			url:        "/get_friend_list?ID=0",
 			want:       nil,
 			wantStatus: http.StatusInternalServerError,
 			wantErr:    true,
@@ -147,7 +147,7 @@ func Test_friendListController_GetFriendListOfFriendsByUserId(t *testing.T) {
 			expects: func(ct *friendListControllerTest) {
 				ct.flu.EXPECT().GetFriendListOfFriendsByUserId(gomock.Any()).Return(want, nil)
 			},
-			url:        "/get_friend_list?userId=123456789",
+			url:        "/get_friend_list?ID=123456789",
 			want:       want,
 			wantStatus: http.StatusOK,
 			wantErr:    false,
@@ -163,7 +163,7 @@ func Test_friendListController_GetFriendListOfFriendsByUserId(t *testing.T) {
 		{
 			name:       "ng: userId not integer",
 			expects:    func(ct *friendListControllerTest) {},
-			url:        "/get_friend_list?userId=invalid",
+			url:        "/get_friend_list?ID=invalid",
 			want:       nil,
 			wantStatus: http.StatusBadRequest,
 			wantErr:    true,
@@ -171,7 +171,7 @@ func Test_friendListController_GetFriendListOfFriendsByUserId(t *testing.T) {
 		{
 			name:       "ng: userId minus",
 			expects:    func(ct *friendListControllerTest) {},
-			url:        "/get_friend_list?userId=-1",
+			url:        "/get_friend_list?ID=-1",
 			want:       nil,
 			wantStatus: http.StatusBadRequest,
 			wantErr:    true,
@@ -179,7 +179,7 @@ func Test_friendListController_GetFriendListOfFriendsByUserId(t *testing.T) {
 		{
 			name:       "ng: userId over mysql max limit",
 			expects:    func(ct *friendListControllerTest) {},
-			url:        "/get_friend_list?userId=999999999999999999",
+			url:        "/get_friend_list?ID=999999999999999999",
 			want:       nil,
 			wantStatus: http.StatusBadRequest,
 			wantErr:    true,
@@ -189,7 +189,7 @@ func Test_friendListController_GetFriendListOfFriendsByUserId(t *testing.T) {
 			expects: func(ct *friendListControllerTest) {
 				ct.flu.EXPECT().GetFriendListOfFriendsByUserId(gomock.Any()).Return(nil, testutil.ErrTest)
 			},
-			url:        "/get_friend_list?userId=0",
+			url:        "/get_friend_list?ID=0",
 			want:       nil,
 			wantStatus: http.StatusInternalServerError,
 			wantErr:    true,

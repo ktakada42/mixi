@@ -156,14 +156,14 @@ func Test_friendListRepository_CheckUserExist(t *testing.T) {
 				}
 				rt.insertTestUserList(t, rt.db, tu)
 			},
-			param:   "/?userId=123456789",
+			param:   "/?ID=123456789",
 			want:    true,
 			wantErr: false,
 		},
 		{
 			name:    "ok: user not exist",
 			prepare: func(rt *friendListRepositoryTest) {},
-			param:   "/?userId=123456789",
+			param:   "/?ID=123456789",
 			want:    false,
 			wantErr: false,
 		},
@@ -209,7 +209,7 @@ func Test_friendListRepository_getOneHopFriendsUserIdList(t *testing.T) {
 					rt.insertTestFriendLink(t, rt.db, ul)
 				}
 			},
-			param:   "/?userId=123456789",
+			param:   "/?ID=123456789",
 			want:    []int{111111, 222222, 333333},
 			wantErr: false,
 		},
@@ -220,7 +220,7 @@ func Test_friendListRepository_getOneHopFriendsUserIdList(t *testing.T) {
 					rt.insertTestUserList(t, rt.db, tu)
 				}
 			},
-			param:   "/?userId=123456789",
+			param:   "/?ID=123456789",
 			want:    nil,
 			wantErr: false,
 		},
@@ -270,7 +270,7 @@ func Test_friendListRepository_getBlockUsersIdList(t *testing.T) {
 					user2Id: 111111,
 				})
 			},
-			param:   "/?userId=123456789",
+			param:   "/?ID=123456789",
 			want:    []int{111111},
 			wantErr: false,
 		},
@@ -287,7 +287,7 @@ func Test_friendListRepository_getBlockUsersIdList(t *testing.T) {
 					rt.insertTestBlockList(t, rt.db, ul)
 				}
 			},
-			param:   "/?userId=123456789",
+			param:   "/?ID=123456789",
 			want:    []int{111111, 222222, 333333},
 			wantErr: false,
 		},
@@ -301,7 +301,7 @@ func Test_friendListRepository_getBlockUsersIdList(t *testing.T) {
 					rt.insertTestFriendLink(t, rt.db, ul)
 				}
 			},
-			param:   "/?userId=123456789",
+			param:   "/?ID=123456789",
 			want:    nil,
 			wantErr: false,
 		},
@@ -349,7 +349,7 @@ func Test_friendListRepository_getFriendListByUserIdExcludingBlockUsers(t *testi
 				}
 			},
 			arg:     []int{333333},
-			param:   "/?userId=123456789",
+			param:   "/?ID=123456789",
 			want:    newFriendList(),
 			wantErr: false,
 		},
@@ -364,7 +364,7 @@ func Test_friendListRepository_getFriendListByUserIdExcludingBlockUsers(t *testi
 				}
 			},
 			arg:   []int{111111, 222222, 333333},
-			param: "/?userId=123456789",
+			param: "/?ID=123456789",
 			want: &model.FriendList{
 				Friends: []*model.User(nil),
 			},
@@ -381,7 +381,7 @@ func Test_friendListRepository_getFriendListByUserIdExcludingBlockUsers(t *testi
 				}
 			},
 			arg:     nil,
-			param:   "/?userId=123456789",
+			param:   "/?ID=123456789",
 			want:    nil,
 			wantErr: true,
 		},
@@ -431,7 +431,7 @@ func Test_friendListRepository_GetFriendListByUserId(t *testing.T) {
 					user2Id: 333333,
 				})
 			},
-			param:   "/?userId=123456789",
+			param:   "/?ID=123456789",
 			want:    newFriendList(),
 			wantErr: false,
 		},
@@ -448,7 +448,7 @@ func Test_friendListRepository_GetFriendListByUserId(t *testing.T) {
 					rt.insertTestBlockList(t, rt.db, ul)
 				}
 			},
-			param: "/?userId=123456789",
+			param: "/?ID=123456789",
 			want: &model.FriendList{
 				Friends: []*model.User(nil),
 			},
@@ -464,7 +464,7 @@ func Test_friendListRepository_GetFriendListByUserId(t *testing.T) {
 					rt.insertTestFriendLink(t, rt.db, testUserLink[i])
 				}
 			},
-			param:   "/?userId=123456789",
+			param:   "/?ID=123456789",
 			want:    newFriendList(),
 			wantErr: false,
 		},
@@ -529,7 +529,7 @@ func Test_friendListRepository_getFriendListOfFriendsByUserIdExcludingOneHopFrie
 				}
 			},
 			arg:     []int{333333},
-			param:   "/?userId=123456789",
+			param:   "/?ID=123456789",
 			want:    newFriendList(),
 			wantErr: false,
 		},
@@ -544,7 +544,7 @@ func Test_friendListRepository_getFriendListOfFriendsByUserIdExcludingOneHopFrie
 				}
 			},
 			arg:   []int{111111, 222222, 333333},
-			param: "/?userId=123456789",
+			param: "/?ID=123456789",
 			want: &model.FriendList{
 				Friends: []*model.User(nil),
 			},
@@ -561,7 +561,7 @@ func Test_friendListRepository_getFriendListOfFriendsByUserIdExcludingOneHopFrie
 				}
 			},
 			arg:     nil,
-			param:   "/?userId=123456789",
+			param:   "/?ID=123456789",
 			want:    nil,
 			wantErr: true,
 		},
@@ -633,7 +633,7 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
 					user2Id: 333333,
 				})
 			},
-			param:   "/?userId=123456789",
+			param:   "/?ID=123456789",
 			want:    newFriendList(),
 			wantErr: false,
 		},
@@ -654,7 +654,7 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
 					rt.insertTestFriendLink(t, rt.db, ul)
 				}
 			},
-			param: "/?userId=123456789",
+			param: "/?ID=123456789",
 			want: &model.FriendList{
 				Friends: []*model.User(nil),
 			},
@@ -674,7 +674,7 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
 					rt.insertTestFriendLink(t, rt.db, testUserLink[i])
 				}
 			},
-			param:   "/?userId=123456789",
+			param:   "/?ID=123456789",
 			want:    newFriendList(),
 			wantErr: false,
 		},
@@ -688,7 +688,7 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
 					rt.insertTestFriendLink(t, rt.db, ul)
 				}
 			},
-			param: "/?userId=123456789",
+			param: "/?ID=123456789",
 			want: &model.FriendList{
 				Friends: []*model.User(nil),
 			},
@@ -701,7 +701,7 @@ func Test_friendListRepository_GetFriendListOfFriendsByUserId(t *testing.T) {
 					rt.insertTestUserList(t, rt.db, tu)
 				}
 			},
-			param: "/?userId=123456789",
+			param: "/?ID=123456789",
 			want: &model.FriendList{
 				Friends: []*model.User(nil),
 			},

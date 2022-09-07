@@ -9,7 +9,7 @@ paths:
       description: "指定したユーザのフレンドのリストを返す"
       summary: "get friend list of specified user"
       parameters:
-        - name: userId
+        - name: ID
           in: query
           required: true
           description: "フレンドリストを取得したいユーザの id を指定する"
@@ -33,7 +33,7 @@ paths:
       description: "指定したユーザのフレンドのフレンドのリストを返す"
       summary: "get friend list of friends of specified user"
       parameters:
-        - name: userId
+        - name: ID
           in: query
           required: true
           description: "フレンドリストを取得したいユーザの id を指定する"
@@ -75,12 +75,12 @@ components:
     User:
       type: object
       properties:
-        userId:
+        ID:
           $ref: "#/components/schemas/id"
         name:
           $ref: "#/components/schemas/name"
       required:
-        - userId
+        - ID
         - name
     FriendList:
       type: object
