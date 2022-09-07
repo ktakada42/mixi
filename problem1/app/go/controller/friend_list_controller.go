@@ -6,7 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"problem1/httputil"
+	"problem1/pkg/httputil"
 	"problem1/usecase"
 )
 

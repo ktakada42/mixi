@@ -3,7 +3,7 @@ package model
 import (
 	"testing"
 
-	"problem1/testutil"
+	"problem1/pkg/testutil"
 )
 
 func Test_FriendList_SchemaValidation(t *testing.T) {

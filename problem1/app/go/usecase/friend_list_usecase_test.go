@@ -10,10 +10,10 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
-	"problem1/httputil"
 	"problem1/mock/mock_service"
 	"problem1/model"
-	"problem1/testutil"
+	"problem1/pkg/httputil"
+	"problem1/pkg/testutil"
 )
 
 type friendListUseCaseTest struct {

@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	"problem1/testutil"
+	"problem1/pkg/testutil"
 )
 
 func Test_httpError_SchemaValidation(t *testing.T) {

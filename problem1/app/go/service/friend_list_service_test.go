@@ -11,7 +11,7 @@ import (
 
 	"problem1/mock/mock_repository"
 	"problem1/model"
-	"problem1/testutil"
+	"problem1/pkg/testutil"
 )
 
 type friendListServiceTest struct {

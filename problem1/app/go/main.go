@@ -10,7 +10,7 @@ import (
 
 	"problem1/configs"
 	"problem1/controller"
-	"problem1/httputil/middleware"
+	"problem1/pkg/httputil/middleware"
 	"problem1/repository"
 	"problem1/service"
 	"problem1/usecase"

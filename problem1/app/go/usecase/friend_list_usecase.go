@@ -6,8 +6,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"problem1/httputil"
 	"problem1/model"
+	"problem1/pkg/httputil"
 	"problem1/service"
 )
 

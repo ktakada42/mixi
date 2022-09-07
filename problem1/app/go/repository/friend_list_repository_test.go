@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"problem1/model"
-	"problem1/testutil"
+	"problem1/pkg/testutil"
 )
 
 type friendListRepositoryTest struct {
