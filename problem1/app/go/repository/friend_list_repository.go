@@ -168,10 +168,25 @@ WHERE FL.user1_id = ?`
 	return &model.FriendList{Friends: friends}, nil
 }
 
-func (r *friendListRepository) getFriendListOfFriendsByUserIdExcludingOneHopFriendsAndBlockUsers(c echo.Context, excludeUsers []int) (*model.FriendList, error) {
+func (r *friendListRepository) GetFriendListOfFriendsByUserId(c echo.Context) (*model.FriendList, error) {
+	oneHopFriends, err := r.getOneHopFriendsUserIdList(c)
+	if err != nil {
+		return nil, err
+	}
+	if len(oneHopFriends) == 0 {
+		return &model.FriendList{Friends: nil}, nil
+	}
+
+	blockUsers, err := r.getBlockUsersIdList(c)
+	if err != nil {
+		return nil, err
+	}
+
+	excludeUsers := append(oneHopFriends, blockUsers...)
+
 	const q = `
-	SELECT U.user_id, U.name
-		FROM users AS U
+	SELECT DISTINCT U.user_id, U.name
+	FROM users AS U
 	INNER JOIN friend_link AS FL
 	ON U.user_id = FL.user2_id
 	INNER JOIN friend_link AS FL2
@@ -188,53 +203,6 @@ func (r *friendListRepository) getFriendListOfFriendsByUserIdExcludingOneHopFrie
 
 	var friends []*model.User
 	if err := dbx.Select(&friends, query, args...); err != nil {
-		return nil, err
-	}
-
-	return &model.FriendList{Friends: friends}, nil
-}
-
-func (r *friendListRepository) GetFriendListOfFriendsByUserId(c echo.Context) (*model.FriendList, error) {
-	oneHopFriends, err := r.getOneHopFriendsUserIdList(c)
-	if err != nil {
-		return nil, err
-	}
-
-	blockUsers, err := r.getBlockUsersIdList(c)
-	if err != nil {
-		return nil, err
-	}
-
-	excludeUsers := append(oneHopFriends, blockUsers...)
-	if len(excludeUsers) > 0 {
-		return r.getFriendListOfFriendsByUserIdExcludingOneHopFriendsAndBlockUsers(c, excludeUsers)
-	}
-
-	const q = `
-	SELECT DISTINCT U.user_id, U.name
-	FROM users AS U
-	INNER JOIN friend_link AS FL
-	ON U.user_id = FL.user2_id
-	INNER JOIN friend_link AS FL2
-	ON FL.user1_id = FL2.user2_id
-	WHERE FL2.user1_id = ?;`
-
-	rows, err := r.db.Query(q, c.Get("userId"))
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var friends []*model.User
-	for rows.Next() {
-		friend := &model.User{}
-		if err := rows.Scan(&friend.Id, &friend.Name); err != nil {
-			return nil, err
-		}
-
-		friends = append(friends, friend)
-	}
-	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 

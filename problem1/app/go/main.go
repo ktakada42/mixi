@@ -7,6 +7,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 
 	"problem1/configs"
 	"problem1/controller"
@@ -31,6 +32,8 @@ func main() {
 
 	e := echo.New()
 
+	e.Use(middleware.Logger())
+
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "minimal_sns_app")
 	})
@@ -44,7 +47,6 @@ func main() {
 	})
 
 	e.GET("/get_friend_of_friend_list_paging", func(c echo.Context) error {
-		// FIXME
 		return nil
 	})
 
