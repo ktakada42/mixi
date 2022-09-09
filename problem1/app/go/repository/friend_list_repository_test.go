@@ -136,6 +136,70 @@ func (r *friendListRepositoryTest) insertTestBlockList(t *testing.T, db *sql.DB,
 	testutil.ExecSQL(t, db, q, testRecord...)
 }
 
+func Test_friendListRepository_InsertUserLink(t *testing.T) {
+	tests := []struct {
+		name    string
+		user1Id int
+		user2Id int
+		table   string
+		want    []int
+		wantErr bool
+	}{
+		{
+			name:    "ok: friend_link",
+			user1Id: testutil.UserIDForDebug,
+			user2Id: 111111,
+			table:   "friend_link",
+			want:    []int{111111},
+			wantErr: false,
+		},
+		{
+			name:    "ok: block_list",
+			user1Id: testutil.UserIDForDebug,
+			user2Id: 111111,
+			table:   "block_list",
+			want:    []int{111111},
+			wantErr: false,
+		},
+		{
+			name:    "ng: table invalid",
+			user1Id: testutil.UserIDForDebug,
+			user2Id: 111111,
+			table:   "invalid",
+			want:    nil,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rt := newFriendListRepositoryTest(t)
+
+			tx := testutil.BeginTx(t, rt.db)
+			err := rt.flr.InsertUserLink(tt.user1Id, tt.user2Id, tt.table)
+			if (err != nil) != tt.wantErr {
+				testutil.RollBackTx(t, tx)
+				t.Fatalf("CheckUserExist() error = %v, wantErr = %v", err, tt.wantErr)
+			}
+			testutil.CommitTx(t, tx)
+
+			if tt.table == "friend_link" {
+				got, err := rt.flr.GetOneHopFriendsUserIdList(tt.user1Id)
+				if err != nil {
+					t.Fatal(err)
+				}
+				assert.Equal(t, tt.want, got)
+			} else {
+				got, err := rt.flr.GetBlockUsersIdList(tt.user1Id)
+				if err != nil {
+					t.Fatal(err)
+				}
+				assert.Equal(t, tt.want, got)
+			}
+		})
+	}
+}
+
 func Test_friendListRepository_CheckUserExist(t *testing.T) {
 	userId := testutil.UserIDForDebug
 	tests := []struct {
@@ -174,6 +238,74 @@ func Test_friendListRepository_CheckUserExist(t *testing.T) {
 				t.Fatalf("CheckUserExist() error = %v, wantErr = %v", err, tt.wantErr)
 			}
 			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func Test_friendListRepository_CheckUserLink(t *testing.T) {
+	userLink := newTestUserLink()
+	userId := testutil.UserIDForDebug
+	tests := []struct {
+		name    string
+		prepare func(*friendListRepositoryTest)
+		user2Id int
+		table   string
+		wantErr bool
+	}{
+		{
+			name: "ok: friend_link",
+			prepare: func(rt *friendListRepositoryTest) {
+				for _, ul := range userLink {
+					rt.insertTestFriendLink(t, rt.db, ul)
+				}
+			},
+			user2Id: 111111,
+			table:   "friend_link",
+			wantErr: false,
+		},
+		{
+			name: "ok: block_list",
+			prepare: func(rt *friendListRepositoryTest) {
+				for _, ul := range userLink {
+					rt.insertTestBlockList(t, rt.db, ul)
+				}
+			},
+			user2Id: 111111,
+			table:   "block_list",
+			wantErr: false,
+		},
+		{
+			name:    "ng: friend_link",
+			prepare: func(rt *friendListRepositoryTest) {},
+			user2Id: 111111,
+			table:   "friend_link",
+			wantErr: true,
+		},
+		{
+			name:    "ng: block_list",
+			prepare: func(rt *friendListRepositoryTest) {},
+			user2Id: 111111,
+			table:   "block_list",
+			wantErr: true,
+		},
+		{
+			name:    "ng: table not exist",
+			prepare: func(rt *friendListRepositoryTest) {},
+			user2Id: 111111,
+			table:   "invalid",
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rt := newFriendListRepositoryTest(t)
+			tt.prepare(rt)
+
+			err := rt.flr.CheckUserLink(userId, tt.user2Id, tt.table)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("CheckUserLink() error = %v, wantErr = %v", err, tt.wantErr)
+			}
 		})
 	}
 }

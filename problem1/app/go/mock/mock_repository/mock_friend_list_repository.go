@@ -49,6 +49,20 @@ func (mr *MockFriendListRepositoryMockRecorder) CheckUserExist(userId interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUserExist", reflect.TypeOf((*MockFriendListRepository)(nil).CheckUserExist), userId)
 }
 
+// CheckUserLink mocks base method.
+func (m *MockFriendListRepository) CheckUserLink(user1Id, user2Id int, table string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckUserLink", user1Id, user2Id, table)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CheckUserLink indicates an expected call of CheckUserLink.
+func (mr *MockFriendListRepositoryMockRecorder) CheckUserLink(user1Id, user2Id, table interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUserLink", reflect.TypeOf((*MockFriendListRepository)(nil).CheckUserLink), user1Id, user2Id, table)
+}
+
 // GetBlockUsersIdList mocks base method.
 func (m *MockFriendListRepository) GetBlockUsersIdList(userId int) ([]int, error) {
 	m.ctrl.T.Helper()
@@ -137,4 +151,18 @@ func (m *MockFriendListRepository) GetOneHopFriendsUserIdList(userId int) ([]int
 func (mr *MockFriendListRepositoryMockRecorder) GetOneHopFriendsUserIdList(userId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOneHopFriendsUserIdList", reflect.TypeOf((*MockFriendListRepository)(nil).GetOneHopFriendsUserIdList), userId)
+}
+
+// InsertUserLink mocks base method.
+func (m *MockFriendListRepository) InsertUserLink(user1Id, user2Id int, table string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InsertUserLink", user1Id, user2Id, table)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// InsertUserLink indicates an expected call of InsertUserLink.
+func (mr *MockFriendListRepositoryMockRecorder) InsertUserLink(user1Id, user2Id, table interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertUserLink", reflect.TypeOf((*MockFriendListRepository)(nil).InsertUserLink), user1Id, user2Id, table)
 }
