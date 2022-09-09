@@ -17,6 +17,10 @@ type httpError struct {
 }
 
 func NewHTTPError(origin error, statusCode int, message string) error {
+	if message == "" {
+		message = origin.Error()
+	}
+
 	return &httpError{
 		origin:     origin,
 		statusCode: statusCode,
