@@ -1,6 +1,7 @@
 package testutil
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"strings"
@@ -69,4 +70,32 @@ func NewSQLMock(t *testing.T) (*sql.DB, sqlmock.Sqlmock) {
 	})
 
 	return db, mock
+}
+
+func BeginTx(t *testing.T, db *sql.DB) *sql.Tx {
+	t.Helper()
+
+	ctx := context.Background()
+	tx, err := db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelRepeatableRead})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return tx
+}
+
+func CommitTx(t *testing.T, tx *sql.Tx) {
+	t.Helper()
+
+	if err := tx.Commit(); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func RollBackTx(t *testing.T, tx *sql.Tx) {
+	t.Helper()
+
+	if err := tx.Rollback(); err != nil {
+		t.Fatal(err)
+	}
 }
