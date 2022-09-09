@@ -55,7 +55,7 @@ func (r *friendListRepository) GetOneHopFriendsUserIdList(userId int) ([]int, er
 	const q = `
 	SELECT user2_id
 	FROM friend_link
-	WHERE user1_id = ?;`
+	WHERE user1_id = ?`
 
 	rows, err := r.db.Query(q, userId)
 	if err != nil {
@@ -85,7 +85,7 @@ func (r *friendListRepository) GetBlockUsersIdList(userId int) ([]int, error) {
 	const q = `
 	SELECT user2_id
 	FROM block_list
-	WHERE user1_id = ?;`
+	WHERE user1_id = ?`
 
 	rows, err := r.db.Query(q, userId)
 	if err != nil {
@@ -146,7 +146,7 @@ func (r *friendListRepository) GetFriendListByUserIdExcludingBlockUsers(userId i
 	FROM users AS U INNER JOIN friend_link AS FL
 	ON U.user_id = FL.user2_id
 	WHERE FL.user1_id = ?
-	AND U.user_id NOT IN (?);`
+	AND	U.user_id NOT IN (?)`
 
 	dbx := sqlx.NewDb(r.db, "mysql")
 
@@ -172,7 +172,7 @@ func (r *friendListRepository) GetFriendListOfFriendsByUserId(userId int, exclud
 	INNER JOIN friend_link AS FL2
 	ON FL.user1_id = FL2.user2_id
 	WHERE FL2.user1_id = ?
-	AND U.user_id NOT IN (?);`
+	AND	U.user_id NOT IN (?)`
 
 	dbx := sqlx.NewDb(r.db, "mysql")
 
@@ -199,7 +199,7 @@ func (r *friendListRepository) GetFriendListOfFriendsByUserIdWithPaging(userId i
 	ON FL.user1_id = FL2.user2_id
 	WHERE FL2.user1_id = ?
 	AND U.user_id NOT IN (?)
-	LIMIT ? OFFSET ?;`
+	LIMIT ? OFFSET ?`
 
 	dbx := sqlx.NewDb(r.db, "mysql")
 
