@@ -7,12 +7,15 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	"problem1/model"
+	"problem1/pkg/httputil"
 )
 
 //go:generate go run github.com/golang/mock/mockgen -source=$GOFILE -destination=../mock/mock_$GOPACKAGE/mock_$GOFILE
 
 type FriendListRepository interface {
 	CheckUserExist(userId int) (bool, error)
+	CheckUserLink(user1Id, user2Id int, table string) error
+	InsertUserLink(user1Id, user2Id int, table string) error
 	GetOneHopFriendsUserIdList(userId int) ([]int, error)
 	GetBlockUsersIdList(userId int) ([]int, error)
 	GetFriendListByUserId(userId int) (*model.FriendList, error)
@@ -49,6 +52,64 @@ func (r *friendListRepository) CheckUserExist(userId int) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (r *friendListRepository) CheckUserLink(user1Id, user2Id int, table string) error {
+	switch table {
+	case "friend_link":
+		const q = `
+		SELECT user1_id, user2_id
+		FROM friend_link
+		WHERE user1_id = ? AND user2_id = ?`
+
+		userLink := &model.UserLinkForRequest{}
+		row := r.db.QueryRow(q, user1Id, user2Id)
+		if err := row.Scan(&userLink.User1Id, &userLink.User2Id); err != nil {
+			return err
+		}
+
+		return nil
+	case "block_list":
+		const q = `
+		SELECT user1_id, user2_id
+		FROM block_list
+		WHERE user1_id = ? AND user2_id = ?`
+
+		userLink := &model.UserLinkForRequest{}
+		row := r.db.QueryRow(q, user1Id, user2Id)
+		if err := row.Scan(&userLink.User1Id, &userLink.User2Id); err != nil {
+			return err
+		}
+
+		return nil
+	default:
+		return httputil.NewHTTPError(errors.New("table not exist"), 400, "")
+	}
+}
+
+func (r *friendListRepository) InsertUserLink(user1Id, user2Id int, table string) error {
+	switch table {
+	case "friend_link":
+		const q = `
+		INSERT INTO friend_link (id, user1_id, user2_id)
+		VALUES (0, ?, ?)`
+
+		if _, err := r.db.Exec(q, user1Id, user2Id); err != nil {
+			return err
+		}
+	case "block_list":
+		const q = `
+		INSERT INTO block_list (id, user1_id, user2_id)
+		VALUES (0, ?, ?)`
+
+		if _, err := r.db.Exec(q, user1Id, user2Id); err != nil {
+			return err
+		}
+	default:
+		return httputil.NewHTTPError(errors.New("table not exist"), 400, "")
+	}
+
+	return nil
 }
 
 func (r *friendListRepository) GetOneHopFriendsUserIdList(userId int) ([]int, error) {
