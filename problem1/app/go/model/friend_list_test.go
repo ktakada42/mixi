@@ -12,6 +12,14 @@ func Test_FriendList_SchemaValidation(t *testing.T) {
 		target     any
 	}{
 		{
+			schemaName: "UserLinkForRequest",
+			target: &UserLinkForRequest{
+				User1Id: testutil.UserIDForDebug,
+				User2Id: testutil.UserIDForDebug,
+				Table:   "friend_link",
+			},
+		},
+		{
 			schemaName: "Friend",
 			target: &Friend{
 				UserId: testutil.UserIDForDebug,
