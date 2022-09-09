@@ -1,23 +1,26 @@
-CREATE TABLE IF NOT EXISTS `users`
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `users`
 (
-    `id`      bigint(20) NOT NULL AUTO_INCREMENT,
-    `user_id` int(11) NOT NULL,
+    `id`      bigint(20)             NOT NULL AUTO_INCREMENT,
+    `user_id` int(11)                NOT NULL UNIQUE,
     `name`    varchar(64) DEFAULT '' NOT NULL,
     PRIMARY KEY (`id`)
 );
 -- user1 user2
-CREATE TABLE IF NOT EXISTS `friend_link`
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `friend_link`
 (
     `id`       bigint(20) NOT NULL AUTO_INCREMENT,
-    `user1_id` int(11) NOT NULL,
-    `user2_id` int(11) NOT NULL,
+    `user1_id` int(11)    NOT NULL,
+    `user2_id` int(11)    NOT NULL,
     PRIMARY KEY (`id`)
 );
 -- user1 user2 block
-CREATE TABLE IF NOT EXISTS `block_list`
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `block_list`
 (
     `id`       bigint(20) NOT NULL AUTO_INCREMENT,
-    `user1_id` int(11) NOT NULL,
-    `user2_id` int(11) NOT NULL,
+    `user1_id` int(11)    NOT NULL,
+    `user2_id` int(11)    NOT NULL,
     PRIMARY KEY (`id`)
 );
