@@ -78,6 +78,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPError"
+  /user_link:
+    post:
+      description: "ユーザ間のリンク情報を登録する"
+      summary: "register link between users"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserLinkForRequest"
+      responses:
+        "200":
+          description: "ok"
+        "400":
+          description: "User not exist"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPError"
 components:
   parameters:
     limit:
@@ -139,3 +158,17 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Friend"
+    UserLinkForRequest:
+      type: object
+      properties:
+        user1Id:
+          $ref: "#/components/schemas/userId"
+        user2Id:
+          $ref: "#/components/schemas/userId"
+        table:
+          type: string
+          example: "friend_link"
+      required:
+        - user1Id
+        - user2Id
+        - table
