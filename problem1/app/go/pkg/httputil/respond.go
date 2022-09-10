@@ -43,6 +43,7 @@ func respondJSON(c echo.Context, status int, payload any) {
 	b, err := json.Marshal(payload)
 	if err != nil {
 		RespondError(c, err)
+		return
 	}
 
 	w := c.Response().Writer
