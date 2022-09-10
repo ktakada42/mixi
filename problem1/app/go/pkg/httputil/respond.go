@@ -4,16 +4,20 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
+	"net/http"
 	"reflect"
 
 	"github.com/labstack/echo/v4"
 )
 
 func RespondError(c echo.Context, err error) {
+	w := c.Response().Writer
+
 	var httpErr HTTPError
 	if errors.As(err, &httpErr) {
-		w := c.Response().Writer
 		w.WriteHeader(httpErr.StatusCode())
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
 	}
 
 	log.Println(err.Error())
