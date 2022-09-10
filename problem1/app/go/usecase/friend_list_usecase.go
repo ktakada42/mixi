@@ -31,8 +31,8 @@ func NewFriendListUseCase(db *sql.DB, fls service.FriendListService) FriendListU
 	}
 }
 
-func (u *friendListUseCase) checkUserExist(e echo.Context) error {
-	userExist, err := u.fls.CheckUserExist(e)
+func (u *friendListUseCase) checkUserExist(userId int) error {
+	userExist, err := u.fls.CheckUserExist(userId)
 	if err != nil {
 		return err
 	}
@@ -44,7 +44,7 @@ func (u *friendListUseCase) checkUserExist(e echo.Context) error {
 }
 
 func (u *friendListUseCase) GetFriendListByUserId(c echo.Context) (*model.FriendList, error) {
-	if err := u.checkUserExist(c); err != nil {
+	if err := u.checkUserExist(c.Get("userId").(int)); err != nil {
 		return nil, err
 	}
 
@@ -52,7 +52,7 @@ func (u *friendListUseCase) GetFriendListByUserId(c echo.Context) (*model.Friend
 }
 
 func (u *friendListUseCase) GetFriendListOfFriendsByUserId(c echo.Context) (*model.FriendList, error) {
-	if err := u.checkUserExist(c); err != nil {
+	if err := u.checkUserExist(c.Get("userId").(int)); err != nil {
 		return nil, err
 	}
 
@@ -60,7 +60,7 @@ func (u *friendListUseCase) GetFriendListOfFriendsByUserId(c echo.Context) (*mod
 }
 
 func (u *friendListUseCase) GetFriendListOfFriendsByUserIdWithPaging(c echo.Context) (*model.FriendList, error) {
-	if err := u.checkUserExist(c); err != nil {
+	if err := u.checkUserExist(c.Get("userId").(int)); err != nil {
 		return nil, err
 	}
 

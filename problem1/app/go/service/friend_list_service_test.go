@@ -92,7 +92,7 @@ func Test_friendListService_CheckUserExist(t *testing.T) {
 			st := newFriendListServiceTest(t)
 			tt.expects(st)
 
-			got, err := st.fls.CheckUserExist(st.c)
+			got, err := st.fls.CheckUserExist(userId)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("CheckUserExist() error = %v, wantErr = %v", err, tt.wantErr)
 			}

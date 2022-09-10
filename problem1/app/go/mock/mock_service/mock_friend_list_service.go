@@ -36,18 +36,18 @@ func (m *MockFriendListService) EXPECT() *MockFriendListServiceMockRecorder {
 }
 
 // CheckUserExist mocks base method.
-func (m *MockFriendListService) CheckUserExist(c echo.Context) (bool, error) {
+func (m *MockFriendListService) CheckUserExist(userId int) (bool, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CheckUserExist", c)
+	ret := m.ctrl.Call(m, "CheckUserExist", userId)
 	ret0, _ := ret[0].(bool)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CheckUserExist indicates an expected call of CheckUserExist.
-func (mr *MockFriendListServiceMockRecorder) CheckUserExist(c interface{}) *gomock.Call {
+func (mr *MockFriendListServiceMockRecorder) CheckUserExist(userId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUserExist", reflect.TypeOf((*MockFriendListService)(nil).CheckUserExist), c)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUserExist", reflect.TypeOf((*MockFriendListService)(nil).CheckUserExist), userId)
 }
 
 // GetFriendListByUserId mocks base method.

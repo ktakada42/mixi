@@ -68,21 +68,21 @@ func Test_friendListUseCase_checkUserExist(t *testing.T) {
 		{
 			name: "ok",
 			expects: func(ut *friendListUseCaseTest) {
-				ut.fls.EXPECT().CheckUserExist(ut.c).Return(true, nil)
+				ut.fls.EXPECT().CheckUserExist(testutil.UserIDForDebug).Return(true, nil)
 			},
 			wantErr: false,
 		},
 		{
 			name: "ng: error at CheckUserExist()",
 			expects: func(ut *friendListUseCaseTest) {
-				ut.fls.EXPECT().CheckUserExist(ut.c).Return(false, testutil.ErrTest)
+				ut.fls.EXPECT().CheckUserExist(testutil.UserIDForDebug).Return(false, testutil.ErrTest)
 			},
 			wantErr: true,
 		},
 		{
 			name: "ng: user not exist",
 			expects: func(ut *friendListUseCaseTest) {
-				ut.fls.EXPECT().CheckUserExist(ut.c).Return(false, nil)
+				ut.fls.EXPECT().CheckUserExist(testutil.UserIDForDebug).Return(false, nil)
 			},
 			wantErr:     true,
 			wantErrCode: http.StatusBadRequest,
@@ -94,7 +94,7 @@ func Test_friendListUseCase_checkUserExist(t *testing.T) {
 			ut := newFriendListUseCaseTest(t)
 			tt.expects(ut)
 
-			err := ut.fluStruct.checkUserExist(ut.c)
+			err := ut.fluStruct.checkUserExist(testutil.UserIDForDebug)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("checkUserExist() error = %v, wantErr = %v", err, tt.wantErr)
 			}
@@ -119,7 +119,7 @@ func Test_friendListUseCase_GetFriendListByUserId(t *testing.T) {
 		{
 			name: "ok",
 			expects: func(ut *friendListUseCaseTest) {
-				ut.fls.EXPECT().CheckUserExist(ut.c).Return(true, nil)
+				ut.fls.EXPECT().CheckUserExist(testutil.UserIDForDebug).Return(true, nil)
 				ut.fls.EXPECT().GetFriendListByUserId(ut.c).Return(want, nil)
 			},
 			want:    want,
@@ -128,7 +128,7 @@ func Test_friendListUseCase_GetFriendListByUserId(t *testing.T) {
 		{
 			name: "ng: user not exist",
 			expects: func(ut *friendListUseCaseTest) {
-				ut.fls.EXPECT().CheckUserExist(ut.c).Return(false, testutil.ErrTest)
+				ut.fls.EXPECT().CheckUserExist(testutil.UserIDForDebug).Return(false, testutil.ErrTest)
 			},
 			want:    nil,
 			wantErr: true,
@@ -136,7 +136,7 @@ func Test_friendListUseCase_GetFriendListByUserId(t *testing.T) {
 		{
 			name: "ng: error at GetFriendListByUserId()",
 			expects: func(ut *friendListUseCaseTest) {
-				ut.fls.EXPECT().CheckUserExist(ut.c).Return(true, nil)
+				ut.fls.EXPECT().CheckUserExist(testutil.UserIDForDebug).Return(true, nil)
 				ut.fls.EXPECT().GetFriendListByUserId(ut.c).Return(nil, testutil.ErrTest)
 			},
 			want:    nil,
@@ -170,7 +170,7 @@ func Test_friendListUseCase_GetFriendListOfFriendsByUserId(t *testing.T) {
 		{
 			name: "ok",
 			expects: func(ut *friendListUseCaseTest) {
-				ut.fls.EXPECT().CheckUserExist(ut.c).Return(true, nil)
+				ut.fls.EXPECT().CheckUserExist(testutil.UserIDForDebug).Return(true, nil)
 				ut.fls.EXPECT().GetFriendListOfFriendsByUserId(ut.c).Return(want, nil)
 			},
 			want:    want,
@@ -179,7 +179,7 @@ func Test_friendListUseCase_GetFriendListOfFriendsByUserId(t *testing.T) {
 		{
 			name: "ng: user not exist",
 			expects: func(ut *friendListUseCaseTest) {
-				ut.fls.EXPECT().CheckUserExist(ut.c).Return(false, testutil.ErrTest)
+				ut.fls.EXPECT().CheckUserExist(testutil.UserIDForDebug).Return(false, testutil.ErrTest)
 			},
 			want:    nil,
 			wantErr: true,
@@ -187,7 +187,7 @@ func Test_friendListUseCase_GetFriendListOfFriendsByUserId(t *testing.T) {
 		{
 			name: "ng: error at GetFriendListOfFriendsByUserId()",
 			expects: func(ut *friendListUseCaseTest) {
-				ut.fls.EXPECT().CheckUserExist(ut.c).Return(true, nil)
+				ut.fls.EXPECT().CheckUserExist(testutil.UserIDForDebug).Return(true, nil)
 				ut.fls.EXPECT().GetFriendListOfFriendsByUserId(ut.c).Return(nil, testutil.ErrTest)
 			},
 			want:    nil,
@@ -221,7 +221,7 @@ func Test_friendListUseCase_GetFriendListOfFriendsByUserIdWithPaging(t *testing.
 		{
 			name: "ok",
 			expects: func(ut *friendListUseCaseTest) {
-				ut.fls.EXPECT().CheckUserExist(ut.c).Return(true, nil)
+				ut.fls.EXPECT().CheckUserExist(testutil.UserIDForDebug).Return(true, nil)
 				ut.fls.EXPECT().GetFriendListOfFriendsByUserIdWithPaging(ut.c).Return(want, nil)
 			},
 			want:    want,
@@ -230,7 +230,7 @@ func Test_friendListUseCase_GetFriendListOfFriendsByUserIdWithPaging(t *testing.
 		{
 			name: "ng: user not exist",
 			expects: func(ut *friendListUseCaseTest) {
-				ut.fls.EXPECT().CheckUserExist(ut.c).Return(false, testutil.ErrTest)
+				ut.fls.EXPECT().CheckUserExist(testutil.UserIDForDebug).Return(false, testutil.ErrTest)
 			},
 			want:    nil,
 			wantErr: true,
@@ -238,7 +238,7 @@ func Test_friendListUseCase_GetFriendListOfFriendsByUserIdWithPaging(t *testing.
 		{
 			name: "ng: error at GetFriendListOfFriendsByUserId()",
 			expects: func(ut *friendListUseCaseTest) {
-				ut.fls.EXPECT().CheckUserExist(ut.c).Return(true, nil)
+				ut.fls.EXPECT().CheckUserExist(testutil.UserIDForDebug).Return(true, nil)
 				ut.fls.EXPECT().GetFriendListOfFriendsByUserIdWithPaging(ut.c).Return(nil, testutil.ErrTest)
 			},
 			want:    nil,
