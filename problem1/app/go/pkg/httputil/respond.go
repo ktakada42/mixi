@@ -9,17 +9,15 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func RespondError(c echo.Context, err error) {
-	w := c.Response().Writer
+func RespondError(c echo.Context, err error) error {
+	log.Println(err.Error())
 
 	var httpErr HTTPError
 	if errors.As(err, &httpErr) {
-		w.WriteHeader(httpErr.StatusCode())
+		return c.JSON(httpErr.StatusCode(), httpErr)
 	} else {
-		w.WriteHeader(http.StatusInternalServerError)
+		return c.JSON(http.StatusInternalServerError, err)
 	}
-
-	log.Println(err.Error())
 }
 
 func RespondJSON(c echo.Context, status int, payload any) {

@@ -10,6 +10,7 @@ import (
 
 	"problem1/configs"
 	"problem1/controller"
+	"problem1/pkg/httputil"
 	"problem1/pkg/httputil/middleware"
 	"problem1/repository"
 	"problem1/service"
@@ -39,19 +40,39 @@ func main() {
 	})
 
 	e.GET("/get_friend_list", func(c echo.Context) error {
-		return friendListController.GetFriendListByUserId(c)
+		err := friendListController.GetFriendListByUserId(c)
+		if err != nil {
+			return httputil.RespondError(c, err)
+		}
+
+		return nil
 	})
 
 	e.GET("/get_friend_of_friend_list", func(c echo.Context) error {
-		return friendListController.GetFriendListOfFriendsByUserId(c)
+		err := friendListController.GetFriendListOfFriendsByUserId(c)
+		if err != nil {
+			return httputil.RespondError(c, err)
+		}
+
+		return nil
 	})
 
 	e.GET("/get_friend_of_friend_list_paging", func(c echo.Context) error {
-		return friendListController.GetFriendListOfFriendsByUserIdWithPaging(c)
+		err := friendListController.GetFriendListOfFriendsByUserIdWithPaging(c)
+		if err != nil {
+			return httputil.RespondError(c, err)
+		}
+
+		return nil
 	})
 
 	e.POST("/user_link", func(c echo.Context) error {
-		return friendListController.PostUserLink(c)
+		err := friendListController.PostUserLink(c)
+		if err != nil {
+			return httputil.RespondError(c, err)
+		}
+
+		return nil
 	})
 
 	e.Logger.Fatal(e.Start(":" + strconv.Itoa(conf.Server.Port)))
