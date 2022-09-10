@@ -1,6 +1,9 @@
 package service
 
 import (
+	"database/sql"
+	"errors"
+
 	"github.com/labstack/echo/v4"
 
 	"problem1/model"
@@ -11,6 +14,7 @@ import (
 
 type FriendListService interface {
 	CheckUserExist(c echo.Context) (bool, error)
+	InsertUserLink(ulfr *model.UserLinkForRequest) error
 	GetFriendListByUserId(c echo.Context) (*model.FriendList, error)
 	GetFriendListOfFriendsByUserId(c echo.Context) (*model.FriendList, error)
 	GetFriendListOfFriendsByUserIdWithPaging(c echo.Context) (*model.FriendList, error)
@@ -30,6 +34,18 @@ func (s *friendListService) CheckUserExist(c echo.Context) (bool, error) {
 	userId := c.Get("userId").(int)
 
 	return s.flr.CheckUserExist(userId)
+}
+
+func (s *friendListService) InsertUserLink(ulfr *model.UserLinkForRequest) error {
+	if err := s.flr.CheckUserLink(ulfr.User1Id, ulfr.User2Id, ulfr.Table); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return s.flr.InsertUserLink(ulfr.User1Id, ulfr.User2Id, ulfr.Table)
+		}
+
+		return err
+	}
+
+	return nil
 }
 
 func (s *friendListService) GetFriendListByUserId(c echo.Context) (*model.FriendList, error) {
