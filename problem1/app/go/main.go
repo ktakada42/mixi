@@ -50,5 +50,9 @@ func main() {
 		return friendListController.GetFriendListOfFriendsByUserIdWithPaging(c)
 	})
 
+	e.POST("/user_link", func(c echo.Context) error {
+		return friendListController.PostUserLink(c)
+	})
+
 	e.Logger.Fatal(e.Start(":" + strconv.Itoa(conf.Server.Port)))
 }
