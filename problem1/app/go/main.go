@@ -45,7 +45,7 @@ func main() {
 			return httputil.RespondError(c, err)
 		}
 
-		return c.NoContent(http.StatusOK)
+		return nil
 	})
 
 	e.GET("/get_friend_of_friend_list", func(c echo.Context) error {
@@ -54,7 +54,7 @@ func main() {
 			return httputil.RespondError(c, err)
 		}
 
-		return c.NoContent(http.StatusOK)
+		return nil
 	})
 
 	e.GET("/get_friend_of_friend_list_paging", func(c echo.Context) error {
@@ -63,7 +63,7 @@ func main() {
 			return httputil.RespondError(c, err)
 		}
 
-		return c.NoContent(http.StatusOK)
+		return nil
 	})
 
 	e.POST("/user_link", func(c echo.Context) error {
@@ -72,7 +72,7 @@ func main() {
 			return httputil.RespondError(c, err)
 		}
 
-		return c.NoContent(http.StatusOK)
+		return nil
 	})
 
 	e.Logger.Fatal(e.Start(":" + strconv.Itoa(conf.Server.Port)))

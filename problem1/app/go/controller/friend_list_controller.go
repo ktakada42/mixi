@@ -52,7 +52,7 @@ func (c *friendListController) PostUserLink(ctx echo.Context) error {
 			return err
 		}
 
-		return nil
+		return ctx.NoContent(http.StatusOK)
 	default:
 		return httputil.NewHTTPError(errors.New("table not exist"), http.StatusBadRequest, "")
 	}
@@ -73,8 +73,7 @@ func (c *friendListController) GetFriendListByUserId(ctx echo.Context) error {
 		return err
 	}
 
-	httputil.RespondJSON(ctx, http.StatusOK, friendList)
-	return nil
+	return ctx.JSON(http.StatusOK, friendList)
 }
 
 func (c *friendListController) GetFriendListOfFriendsByUserId(ctx echo.Context) error {
@@ -92,8 +91,7 @@ func (c *friendListController) GetFriendListOfFriendsByUserId(ctx echo.Context) 
 		return err
 	}
 
-	httputil.RespondJSON(ctx, http.StatusOK, friendList)
-	return nil
+	return ctx.JSON(http.StatusOK, friendList)
 }
 
 func (c *friendListController) GetFriendListOfFriendsByUserIdWithPaging(ctx echo.Context) error {
@@ -111,6 +109,5 @@ func (c *friendListController) GetFriendListOfFriendsByUserIdWithPaging(ctx echo
 		return err
 	}
 
-	httputil.RespondJSON(ctx, http.StatusOK, friendList)
-	return nil
+	return ctx.JSON(http.StatusOK, friendList)
 }
