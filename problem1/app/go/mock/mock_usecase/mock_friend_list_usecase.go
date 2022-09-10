@@ -79,3 +79,17 @@ func (mr *MockFriendListUseCaseMockRecorder) GetFriendListOfFriendsByUserIdWithP
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFriendListOfFriendsByUserIdWithPaging", reflect.TypeOf((*MockFriendListUseCase)(nil).GetFriendListOfFriendsByUserIdWithPaging), c)
 }
+
+// PostUserLink mocks base method.
+func (m *MockFriendListUseCase) PostUserLink(ulfr *model.UserLinkForRequest) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PostUserLink", ulfr)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PostUserLink indicates an expected call of PostUserLink.
+func (mr *MockFriendListUseCaseMockRecorder) PostUserLink(ulfr interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PostUserLink", reflect.TypeOf((*MockFriendListUseCase)(nil).PostUserLink), ulfr)
+}

@@ -107,6 +107,85 @@ func Test_friendListUseCase_checkUserExist(t *testing.T) {
 	}
 }
 
+func Test_friendListUseCase_PostUserLink(t *testing.T) {
+	req := &model.UserLinkForRequest{
+		User1Id: testutil.UserIDForDebug,
+		User2Id: testutil.UserIDForDebug,
+	}
+	tests := []struct {
+		name    string
+		expects func(*friendListUseCaseTest)
+		want    error
+		wantErr bool
+	}{
+		{
+			name: "ok",
+			expects: func(ut *friendListUseCaseTest) {
+				ut.fls.EXPECT().CheckUserExist(req.User1Id).Return(true, nil)
+				ut.fls.EXPECT().CheckUserExist(req.User2Id).Return(true, nil)
+				ut.fls.EXPECT().InsertUserLink(req).Return(nil)
+			},
+			want:    nil,
+			wantErr: false,
+		},
+		{
+			name: "ng: user1 not exist",
+			expects: func(ut *friendListUseCaseTest) {
+				ut.fls.EXPECT().CheckUserExist(req.User1Id).Return(false, nil)
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "ng: user2 not exist",
+			expects: func(ut *friendListUseCaseTest) {
+				ut.fls.EXPECT().CheckUserExist(req.User1Id).Return(true, nil)
+				ut.fls.EXPECT().CheckUserExist(req.User2Id).Return(false, nil)
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "ng: error at check user1 exist",
+			expects: func(ut *friendListUseCaseTest) {
+				ut.fls.EXPECT().CheckUserExist(req.User1Id).Return(false, testutil.ErrTest)
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "ng: error at check user2 exist",
+			expects: func(ut *friendListUseCaseTest) {
+				ut.fls.EXPECT().CheckUserExist(req.User1Id).Return(true, nil)
+				ut.fls.EXPECT().CheckUserExist(req.User2Id).Return(false, testutil.ErrTest)
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "ng: error at InsertUserLink",
+			expects: func(ut *friendListUseCaseTest) {
+				ut.fls.EXPECT().CheckUserExist(req.User1Id).Return(true, nil)
+				ut.fls.EXPECT().CheckUserExist(req.User2Id).Return(true, nil)
+				ut.fls.EXPECT().InsertUserLink(req).Return(testutil.ErrTest)
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ut := newFriendListUseCaseTest(t)
+			tt.expects(ut)
+
+			if err := ut.flu.PostUserLink(req); (err != nil) != tt.wantErr {
+				t.Fatalf("PostUserLink() error = %v, wantErr = %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func Test_friendListUseCase_GetFriendListByUserId(t *testing.T) {
 	want := newFriendList()
 
