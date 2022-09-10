@@ -36,15 +36,6 @@ func (e *httpError) StatusCode() int {
 	return e.statusCode
 }
 
-func ConvertErrorToHTTPError(statusCode int, err error) error {
-	var hErr HTTPError
-	if errors.As(err, &hErr) {
-		return NewHTTPError(err, statusCode, err.Error())
-	}
-
-	return err
-}
-
 func As(err error, c int) bool {
 	var hErr HTTPError
 	if errors.As(err, &hErr) && hErr.StatusCode() == c {
