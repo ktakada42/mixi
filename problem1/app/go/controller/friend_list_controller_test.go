@@ -48,6 +48,100 @@ func newFriendList() *model.FriendList {
 	}
 }
 
+func Test_friendListController_PostUserLink(t *testing.T) {
+	testRequest := &model.UserLinkForRequest{
+		User1Id: testutil.UserIDForDebug,
+		User2Id: testutil.UserIDForDebug,
+		Table:   "friend_link",
+	}
+
+	tests := []struct {
+		name       string
+		expects    func(test *friendListControllerTest)
+		payload    any
+		wantStatus int
+		wantErr    bool
+	}{
+		{
+			name: "ok",
+			expects: func(ct *friendListControllerTest) {
+				ct.flu.EXPECT().PostUserLink(testRequest).Return(nil)
+			},
+			payload: &model.UserLinkForRequest{
+				User1Id: testutil.UserIDForDebug,
+				User2Id: testutil.UserIDForDebug,
+				Table:   "friend_link",
+			},
+			wantStatus: http.StatusOK,
+			wantErr:    false,
+		},
+		{
+			name:       "ng: error at Decode()",
+			expects:    func(ct *friendListControllerTest) {},
+			payload:    "invalid",
+			wantStatus: http.StatusInternalServerError,
+			wantErr:    true,
+		},
+		{
+			name:    "ng: user1Id not invalid",
+			expects: func(ct *friendListControllerTest) {},
+			payload: &model.UserLinkForRequest{
+				User1Id: -1,
+				User2Id: testutil.UserIDForDebug,
+			},
+			wantStatus: http.StatusBadRequest,
+			wantErr:    true,
+		},
+		{
+			name:    "ng: user2Id not invalid",
+			expects: func(ct *friendListControllerTest) {},
+			payload: &model.UserLinkForRequest{
+				User1Id: testutil.UserIDForDebug,
+				User2Id: -1,
+			},
+			wantStatus: http.StatusBadRequest,
+			wantErr:    true,
+		},
+		{
+			name: "ng: error at PostUserLink()",
+			expects: func(ct *friendListControllerTest) {
+				ct.flu.EXPECT().PostUserLink(testRequest).Return(testutil.ErrTest)
+			},
+			payload: &model.UserLinkForRequest{
+				User1Id: testutil.UserIDForDebug,
+				User2Id: testutil.UserIDForDebug,
+				Table:   "friend_link",
+			},
+			wantStatus: http.StatusInternalServerError,
+			wantErr:    true,
+		},
+		{
+			name:    "ng: table not exist",
+			expects: func(ct *friendListControllerTest) {},
+			payload: &model.UserLinkForRequest{
+				User1Id: testutil.UserIDForDebug,
+				User2Id: testutil.UserIDForDebug,
+				Table:   "invalid",
+			},
+			wantStatus: http.StatusBadRequest,
+			wantErr:    true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ct := newFriendListControllerTest(t)
+			tt.expects(ct)
+
+			rec, req := httputil.NewRequestAndRecorder("POST", "/user_link", testutil.I2Reader(t, tt.payload))
+			ct.echo.POST("/user_link", ct.flc.PostUserLink)
+			ct.echo.ServeHTTP(rec, req)
+
+			assert.Equal(t, tt.wantStatus, rec.Code)
+		})
+	}
+}
+
 func Test_friendListController_GetFriendListByUserId(t *testing.T) {
 	want := newFriendList()
 

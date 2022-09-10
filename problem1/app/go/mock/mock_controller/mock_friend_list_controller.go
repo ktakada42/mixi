@@ -61,3 +61,31 @@ func (mr *MockFriendListControllerMockRecorder) GetFriendListOfFriendsByUserId(c
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFriendListOfFriendsByUserId", reflect.TypeOf((*MockFriendListController)(nil).GetFriendListOfFriendsByUserId), c)
 }
+
+// GetFriendListOfFriendsByUserIdWithPaging mocks base method.
+func (m *MockFriendListController) GetFriendListOfFriendsByUserIdWithPaging(c echo.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFriendListOfFriendsByUserIdWithPaging", c)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// GetFriendListOfFriendsByUserIdWithPaging indicates an expected call of GetFriendListOfFriendsByUserIdWithPaging.
+func (mr *MockFriendListControllerMockRecorder) GetFriendListOfFriendsByUserIdWithPaging(c interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFriendListOfFriendsByUserIdWithPaging", reflect.TypeOf((*MockFriendListController)(nil).GetFriendListOfFriendsByUserIdWithPaging), c)
+}
+
+// PostUserLink mocks base method.
+func (m *MockFriendListController) PostUserLink(c echo.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PostUserLink", c)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PostUserLink indicates an expected call of PostUserLink.
+func (mr *MockFriendListControllerMockRecorder) PostUserLink(c interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PostUserLink", reflect.TypeOf((*MockFriendListController)(nil).PostUserLink), c)
+}
