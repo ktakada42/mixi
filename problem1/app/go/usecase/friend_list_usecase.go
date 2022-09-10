@@ -33,11 +33,11 @@ func NewFriendListUseCase(db *sql.DB, fls service.FriendListService) FriendListU
 }
 
 func (u *friendListUseCase) checkUserExist(userId int) error {
-	userExist, err := u.fls.CheckUserExist(userId)
+	exist, err := u.fls.CheckUserExist(userId)
 	if err != nil {
 		return err
 	}
-	if userExist {
+	if exist {
 		return nil
 	}
 
