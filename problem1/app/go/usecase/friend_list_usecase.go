@@ -14,6 +14,7 @@ import (
 //go:generate go run github.com/golang/mock/mockgen -source=$GOFILE -destination=../mock/mock_$GOPACKAGE/mock_$GOFILE
 
 type FriendListUseCase interface {
+	PostUserLink(ulfr *model.UserLinkForRequest) error
 	GetFriendListByUserId(c echo.Context) (*model.FriendList, error)
 	GetFriendListOfFriendsByUserId(c echo.Context) (*model.FriendList, error)
 	GetFriendListOfFriendsByUserIdWithPaging(c echo.Context) (*model.FriendList, error)
@@ -41,6 +42,17 @@ func (u *friendListUseCase) checkUserExist(userId int) error {
 	}
 
 	return httputil.NewHTTPError(err, http.StatusBadRequest, "user not exist")
+}
+
+func (u *friendListUseCase) PostUserLink(ulfr *model.UserLinkForRequest) error {
+	if err := u.checkUserExist(ulfr.User1Id); err != nil {
+		return err
+	}
+	if err := u.checkUserExist(ulfr.User2Id); err != nil {
+		return err
+	}
+
+	return u.fls.InsertUserLink(ulfr)
 }
 
 func (u *friendListUseCase) GetFriendListByUserId(c echo.Context) (*model.FriendList, error) {
