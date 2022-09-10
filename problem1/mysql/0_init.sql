@@ -7,7 +7,7 @@ CREATE TABLE `users`
     PRIMARY KEY (`id`)
 );
 -- user1 user2
-DROP TABLE IF EXISTS `users`;
+DROP TABLE IF EXISTS `friend_link`;
 CREATE TABLE `friend_link`
 (
     `id`       bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -16,7 +16,7 @@ CREATE TABLE `friend_link`
     PRIMARY KEY (`id`)
 );
 -- user1 user2 block
-DROP TABLE IF EXISTS `users`;
+DROP TABLE IF EXISTS `block_list`;
 CREATE TABLE `block_list`
 (
     `id`       bigint(20) unsigned NOT NULL AUTO_INCREMENT,
