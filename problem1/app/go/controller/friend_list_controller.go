@@ -76,7 +76,8 @@ func (c *friendListController) GetFriendListByUserId(ctx echo.Context) error {
 		return err
 	}
 	if userId < 0 || maxUserId < userId {
-		httputil.RespondError(ctx, httputil.NewHTTPError(err, http.StatusBadRequest, "userId is invalid"))
+		err := httputil.NewHTTPError(errors.New("userId is invalid"), http.StatusBadRequest, "")
+		httputil.RespondError(ctx, err)
 		return err
 	}
 	ctx.Set("userId", userId)
@@ -98,7 +99,8 @@ func (c *friendListController) GetFriendListOfFriendsByUserId(ctx echo.Context) 
 		return err
 	}
 	if userId < 0 || maxUserId < userId {
-		httputil.RespondError(ctx, httputil.NewHTTPError(err, http.StatusBadRequest, "userId is invalid"))
+		err := httputil.NewHTTPError(errors.New("userId is invalid"), http.StatusBadRequest, "")
+		httputil.RespondError(ctx, err)
 		return err
 	}
 	ctx.Set("userId", userId)
@@ -120,7 +122,8 @@ func (c *friendListController) GetFriendListOfFriendsByUserIdWithPaging(ctx echo
 		return err
 	}
 	if userId < 0 || maxUserId < userId {
-		httputil.RespondError(ctx, httputil.NewHTTPError(err, http.StatusBadRequest, "userId is invalid"))
+		err := httputil.NewHTTPError(errors.New("userId is invalid"), http.StatusBadRequest, "")
+		httputil.RespondError(ctx, err)
 		return err
 	}
 	ctx.Set("userId", userId)
