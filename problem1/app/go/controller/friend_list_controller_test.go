@@ -79,7 +79,7 @@ func Test_friendListController_PostUserLink(t *testing.T) {
 			name:       "ng: error at Decode()",
 			expects:    func(ct *friendListControllerTest) {},
 			payload:    "invalid",
-			wantStatus: http.StatusInternalServerError,
+			wantStatus: http.StatusBadRequest,
 			wantErr:    true,
 		},
 		{
@@ -134,7 +134,13 @@ func Test_friendListController_PostUserLink(t *testing.T) {
 			tt.expects(ct)
 
 			rec, req := httputil.NewRequestAndRecorder("POST", "/user_link", testutil.I2Reader(t, tt.payload))
-			ct.echo.POST("/user_link", ct.flc.PostUserLink)
+			ct.echo.POST("/user_link", func(c echo.Context) error {
+				if err := ct.flc.PostUserLink(c); err != nil {
+					return httputil.RespondError(c, err)
+				}
+
+				return nil
+			})
 			ct.echo.ServeHTTP(rec, req)
 
 			assert.Equal(t, tt.wantStatus, rec.Code)
@@ -213,7 +219,13 @@ func Test_friendListController_GetFriendListByUserId(t *testing.T) {
 			tt.expects(ct)
 
 			rec, req := httputil.NewRequestAndRecorder("GET", tt.url, nil)
-			ct.echo.GET("/get_friend_list", ct.flc.GetFriendListByUserId)
+			ct.echo.GET("/get_friend_list", func(c echo.Context) error {
+				if err := ct.flc.GetFriendListByUserId(c); err != nil {
+					return httputil.RespondError(c, err)
+				}
+
+				return nil
+			})
 			ct.echo.ServeHTTP(rec, req)
 
 			assert.Equal(t, tt.wantStatus, rec.Code)
@@ -295,7 +307,13 @@ func Test_friendListController_GetFriendListOfFriendsByUserId(t *testing.T) {
 			tt.expects(ct)
 
 			rec, req := httputil.NewRequestAndRecorder("GET", tt.url, nil)
-			ct.echo.GET("/get_friend_list", ct.flc.GetFriendListOfFriendsByUserId)
+			ct.echo.GET("/get_friend_list", func(c echo.Context) error {
+				if err := ct.flc.GetFriendListOfFriendsByUserId(c); err != nil {
+					return httputil.RespondError(c, err)
+				}
+
+				return nil
+			})
 			ct.echo.ServeHTTP(rec, req)
 
 			assert.Equal(t, tt.wantStatus, rec.Code)
@@ -377,7 +395,13 @@ func Test_friendListController_GetFriendListOfFriendsByUserIdWithPaging(t *testi
 			tt.expects(ct)
 
 			rec, req := httputil.NewRequestAndRecorder("GET", tt.url, nil)
-			ct.echo.GET("/get_friend_list", ct.flc.GetFriendListOfFriendsByUserIdWithPaging)
+			ct.echo.GET("/get_friend_list", func(c echo.Context) error {
+				if err := ct.flc.GetFriendListOfFriendsByUserIdWithPaging(c); err != nil {
+					return httputil.RespondError(c, err)
+				}
+
+				return nil
+			})
 			ct.echo.ServeHTTP(rec, req)
 
 			assert.Equal(t, tt.wantStatus, rec.Code)
