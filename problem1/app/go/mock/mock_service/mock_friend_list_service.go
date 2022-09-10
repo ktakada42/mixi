@@ -94,3 +94,17 @@ func (mr *MockFriendListServiceMockRecorder) GetFriendListOfFriendsByUserIdWithP
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFriendListOfFriendsByUserIdWithPaging", reflect.TypeOf((*MockFriendListService)(nil).GetFriendListOfFriendsByUserIdWithPaging), c)
 }
+
+// InsertUserLink mocks base method.
+func (m *MockFriendListService) InsertUserLink(ulfr *model.UserLinkForRequest) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InsertUserLink", ulfr)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// InsertUserLink indicates an expected call of InsertUserLink.
+func (mr *MockFriendListServiceMockRecorder) InsertUserLink(ulfr interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertUserLink", reflect.TypeOf((*MockFriendListService)(nil).InsertUserLink), ulfr)
+}

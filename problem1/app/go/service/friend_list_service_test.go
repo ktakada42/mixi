@@ -101,6 +101,89 @@ func Test_friendListService_CheckUserExist(t *testing.T) {
 	}
 }
 
+func Test_friendListService_InsertUserLink(t *testing.T) {
+	req := &model.UserLinkForRequest{
+		User1Id: testutil.UserIDForDebug,
+		User2Id: testutil.UserIDForDebug,
+	}
+	tests := []struct {
+		name    string
+		expects func(test *friendListServiceTest)
+		want    error
+		wantErr bool
+	}{
+		{
+			name: "ok: friend_link insert",
+			expects: func(st *friendListServiceTest) {
+				req.Table = "friend_link"
+				st.flr.EXPECT().CheckUserLink(req.User1Id, req.User2Id, req.Table).Return(sql.ErrNoRows)
+				st.flr.EXPECT().InsertUserLink(req.User1Id, req.User2Id, req.Table).Return(nil)
+			},
+			want:    nil,
+			wantErr: false,
+		},
+		{
+			name: "ok: block_list insert",
+			expects: func(st *friendListServiceTest) {
+				req.Table = "block_list"
+				st.flr.EXPECT().CheckUserLink(req.User1Id, req.User2Id, req.Table).Return(sql.ErrNoRows)
+				st.flr.EXPECT().InsertUserLink(req.User1Id, req.User2Id, req.Table).Return(nil)
+			},
+			want:    nil,
+			wantErr: false,
+		},
+		{
+			name: "ok: friend_link already exist",
+			expects: func(st *friendListServiceTest) {
+				req.Table = "friend_link"
+				st.flr.EXPECT().CheckUserLink(req.User1Id, req.User2Id, req.Table).Return(nil)
+			},
+			want:    nil,
+			wantErr: false,
+		},
+		{
+			name: "ok: block_list insert",
+			expects: func(st *friendListServiceTest) {
+				req.Table = "block_list"
+				st.flr.EXPECT().CheckUserLink(req.User1Id, req.User2Id, req.Table).Return(nil)
+			},
+			want:    nil,
+			wantErr: false,
+		},
+		{
+			name: "ng: error at CheckUserLink()",
+			expects: func(st *friendListServiceTest) {
+				req.Table = "friend_link"
+				st.flr.EXPECT().CheckUserLink(req.User1Id, req.User2Id, req.Table).Return(testutil.ErrTest)
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "ng: error at InsertUserLink()",
+			expects: func(st *friendListServiceTest) {
+				req.Table = "block_list"
+				st.flr.EXPECT().CheckUserLink(req.User1Id, req.User2Id, req.Table).Return(sql.ErrNoRows)
+				st.flr.EXPECT().InsertUserLink(req.User1Id, req.User2Id, req.Table).Return(testutil.ErrTest)
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			st := newFriendListServiceTest(t)
+			tt.expects(st)
+
+			err := st.fls.InsertUserLink(req)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("InsertUserLink() error = %v, wantErr = %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func Test_friendListService_GetFriendListByUserId(t *testing.T) {
 	userId := testutil.UserIDForDebug
 	blockUsers := []int{0}
