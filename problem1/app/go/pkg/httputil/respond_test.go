@@ -2,7 +2,6 @@ package httputil
 
 import (
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/labstack/echo/v4"
@@ -31,12 +30,14 @@ func Test_respond_RespondError(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			rec := httptest.NewRecorder()
-			c := echo.New().NewContext(nil, rec)
-			RespondError(c, tt.err)
-			resp := rec.Result()
-			defer resp.Body.Close()
-			assert.Equal(t, tt.wantCode, resp.StatusCode)
+			rec, req := NewRequestAndRecorder("GET", "/test", testutil.I2Reader(t, "body"))
+			e := echo.New()
+			e.GET("/test", func(c echo.Context) error {
+				return RespondError(c, tt.err)
+			})
+			e.ServeHTTP(rec, req)
+
+			assert.Equal(t, tt.wantCode, rec.Code)
 		})
 	}
 }
