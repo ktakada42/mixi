@@ -45,6 +45,9 @@ func (c *friendListController) PostUserLink(ctx echo.Context) error {
 	if req.User1Id < 0 || maxUserId < req.User1Id || req.User2Id < 0 || maxUserId < req.User2Id {
 		return httputil.NewHTTPError(errors.New("userId is invalid"), http.StatusBadRequest, "")
 	}
+	if req.User1Id == req.User2Id {
+		return httputil.NewHTTPError(errors.New("user1Id is equal to user2Id"), http.StatusBadRequest, "")
+	}
 
 	switch req.Table {
 	case "friend_link", "block_list":
