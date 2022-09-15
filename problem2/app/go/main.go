@@ -40,8 +40,7 @@ func main() {
 	})
 
 	e.GET("/get_friend_list", func(c echo.Context) error {
-		err := friendListController.GetFriendListByUserId(c)
-		if err != nil {
+		if err := friendListController.GetFriendListByUserId(c); err != nil {
 			return httputil.RespondError(c, err)
 		}
 
@@ -49,8 +48,7 @@ func main() {
 	})
 
 	e.GET("/get_friend_of_friend_list", func(c echo.Context) error {
-		err := friendListController.GetFriendListOfFriendsByUserId(c)
-		if err != nil {
+		if err := friendListController.GetFriendListOfFriendsByUserId(c); err != nil {
 			return httputil.RespondError(c, err)
 		}
 
@@ -58,8 +56,7 @@ func main() {
 	})
 
 	e.GET("/get_friend_of_friend_list_paging", func(c echo.Context) error {
-		err := friendListController.GetFriendListOfFriendsByUserIdWithPaging(c)
-		if err != nil {
+		if err := friendListController.GetFriendListOfFriendsByUserIdWithPaging(c); err != nil {
 			return httputil.RespondError(c, err)
 		}
 
@@ -67,8 +64,7 @@ func main() {
 	})
 
 	e.POST("/user_link", func(c echo.Context) error {
-		err := friendListController.PostUserLink(c)
-		if err != nil {
+		if err := friendListController.PostUserLink(c); err != nil {
 			return httputil.RespondError(c, err)
 		}
 
