@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"errors"
+	"net/http"
 
 	"github.com/jmoiron/sqlx"
 
@@ -83,7 +84,7 @@ func (r *friendListRepository) CheckUserLink(user1Id, user2Id int, table string)
 
 		return nil
 	default:
-		return httputil.NewHTTPError(errors.New("table not exist"), 400, "")
+		return httputil.NewHTTPError(errors.New("table not exist"), http.StatusBadRequest, "")
 	}
 }
 
@@ -106,7 +107,7 @@ func (r *friendListRepository) InsertUserLink(user1Id, user2Id int, table string
 			return err
 		}
 	default:
-		return httputil.NewHTTPError(errors.New("table not exist"), 400, "")
+		return httputil.NewHTTPError(errors.New("table not exist"), http.StatusBadRequest, "")
 	}
 
 	return nil
