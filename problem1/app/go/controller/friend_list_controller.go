@@ -55,7 +55,7 @@ func (c *friendListController) PostUserLink(ctx echo.Context) error {
 			return err
 		}
 
-		return ctx.NoContent(http.StatusOK)
+		return ctx.NoContent(http.StatusCreated)
 	default:
 		return httputil.NewHTTPError(errors.New("table not exist"), http.StatusBadRequest, "")
 	}

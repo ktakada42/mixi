@@ -89,7 +89,7 @@ paths:
             schema:
               $ref: "#/components/schemas/UserLinkForRequest"
       responses:
-        "200":
+        "201":
           description: "ok"
         "400":
           description: "User not exist"
